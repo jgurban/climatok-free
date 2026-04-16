@@ -7269,29 +7269,29 @@ function clearMapTilerMarkers() {
 
 // Globe
 
- const btG = document.getElementById('globe-toggle');
-if (!btG) return;
-
-btG.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  // Premium gate (usa tu bandera real)
-  if (typeof isPremium === "function" && !isPremium()) {
-    showPremiumOverlay?.(t("premium_overlay_info"));
-    return;
-  }
-
-  window.location.href = '/appGlobe/';
-});
-
-// const btG = document.getElementById('globe-toggle');
+//  const btG = document.getElementById('globe-toggle');
 // if (!btG) return;
 
 // btG.addEventListener('click', (e) => {
 //   e.preventDefault();
 
-//   showGlobeMobileOnlyModal();
+//   // Premium gate (usa tu bandera real)
+//   if (typeof isPremium === "function" && !isPremium()) {
+//     showPremiumOverlay?.(t("premium_overlay_info"));
+//     return;
+//   }
+
+//   window.location.href = '/appGlobe/';
 // });
+
+const btG = document.getElementById('globe-toggle');
+if (!btG) return;
+
+btG.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  showGlobeMobileOnlyModal();
+});
 
 
 function showGlobeMobileOnlyModal() {
