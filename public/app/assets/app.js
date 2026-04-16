@@ -1316,7 +1316,7 @@ updateModelSwitcherAvailability();
  * que el usuario ha pagado la suscripción.
  */
 // EDITADO PREMIUM
-let IS_PREMIUM_USER = true;
+let IS_PREMIUM_USER = false;
 
 function updateAppStoreBadgeVisibility(isPremium){
   const el = document.getElementById("appstore-badge");
@@ -1551,7 +1551,7 @@ function setPremiumFromApp(value) {
 
 // EDITADO
 
-  premiumFlag = true;
+  // premiumFlag = true;
 
   IS_PREMIUM_USER = premiumFlag;
 
@@ -7365,7 +7365,7 @@ function showGlobeMobileOnlyModal() {
 
   // 👉 botón principal → landing con enlaces
   document.getElementById('go-app-download').onclick = () => {
-    window.location.href = "https://www.climatok.net";
+    window.location.href = "https://tangerine-elf-d75ce2.netlify.app/app/";
   };
 
   // cerrar
