@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 64 64"
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="info-icon.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="8.65625"
+     inkscape:cx="31.480144"
+     inkscape:cy="33.155235"
+     inkscape:window-width="976"
+     inkscape:window-height="703"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg5" />
+  <!-- Círculo exterior -->
+  <circle
+     cx="32"
+     cy="32"
+     fill="rgba(0,0,0,0.0)"
+     id="circle1"
+     r="28" />
+  <!-- Capa 1: anillo de fondo -->
+  <!-- Capa 2: anillo intermedio -->
+  <!-- Capa 3: anillo interior -->
+  <!-- Sombra suave inferior para dar sensación de volumen -->
+  <ellipse
+     cx="32"
+     cy="43.504002"
+     rx="23.4"
+     ry="9.3599997"
+     fill="rgba(0,0,0,0.25)"
+     id="ellipse4"
+     style="stroke-width:2.34" />
+  <g
+     fill="#FFF"
+     fill-rule="nonzero"
+     stroke="#ffffff"
+     stroke-linejoin="round"
+     stroke-width="0.75"
+     transform="matrix(1.8282686,0,0,1.8163946,17.965797,23.441321)"
+     id="g2"
+     style="fill:#f2f2f2">
+    <polygon
+       points="0,10.6 1.093,9.75 8,14.95 14.907,9.75 16,10.6 8,16.65 "
+       id="polygon1"
+       style="fill:#f2f2f2" />
+    <polygon
+       points="0,6.05 8,0 16,6.05 8,12.1 "
+       id="polygon2"
+       style="fill:#f2f2f2" />
+  </g>
+  <!-- Punto de la "i" -->
+  <circle
+     cx="32.577618"
+     cy="12.194249"
+     fill="#ffffff"
+     id="circle5"
+     style="fill:#4fc3f7;fill-opacity:1;stroke-width:1.6848"
+     r="3.7065601" />
+  <!-- Cuerpo de la "i" -->
+  <rect
+     x="30.218899"
+     y="18.933445"
+     width="4.7174397"
+     height="18.532801"
+     rx="2.3587198"
+     fill="#ffffff"
+     id="rect5"
+     style="fill:#4fc3f7;fill-opacity:1;stroke-width:1.6848" />
+</svg>

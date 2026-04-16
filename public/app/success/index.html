@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ClimaTok Premium</title>
+</head>
+<body>
+  <p>Activating Premium…</p>
+  <script>
+    (async () => {
+      const params = new URLSearchParams(location.search);
+      const sessionId = params.get("session_id");
+      if (!sessionId) {
+        location.href = "/app/";
+        return;
+      }
+
+      const res = await fetch(`/.netlify/functions/verify-entitlement?session_id=${encodeURIComponent(sessionId)}`);
+      const data = await res.json();
+
+      if (data && data.jwt) {
+        localStorage.setItem("climatok_premium_jwt", data.jwt);
+      }
+
+      location.href = "/app/";
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Apple Smart App Banner -->
+  <meta name="apple-itunes-app" content="app-id=6744102515, app-argument=https://climatok.net/">
+
+  <title>ClimaTok — Weather maps & forecasts</title>
+  <meta name="description" content="ClimaTok: interactive weather maps, forecasts and alerts. Web + iPhone/iPad. Daily video with the most relevant weather highlights.">
+  <meta name="theme-color" content="#0b5cff">
+
+  <style>
+    :root{
+      --bg: #070b14;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --line: rgba(255,255,255,.12);
+      --brand: #0b5cff;
+      --brand2:#38bdf8;
+      --ok:#22c55e;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 1120px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(11,92,255,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(56,189,248,.28), transparent 65%),
+        radial-gradient(900px 700px at 40% 115%, rgba(34,197,94,.16), transparent 55%),
+        var(--bg);
+      line-height: 1.45;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding: 24px;}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      padding: 10px 0 18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; text-decoration:none;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 10px 30px rgba(11,92,255,.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 45%);
+      transform: rotate(20deg);
+    }
+    .brand b{font-size:15px; letter-spacing:.2px}
+    .brand span{display:block; font-size:12px; color:var(--muted)}
+    .nav{
+      display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    }
+    .nav a{
+      text-decoration:none; color:var(--muted); font-weight:600; font-size:13px;
+      padding: 8px 10px; border-radius: 10px;
+    }
+    .nav a:hover{background: rgba(255,255,255,.06); color: var(--text);}
+    .hero{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+    @media (max-width: 980px){
+      .hero{grid-template-columns: 1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .heroLeft{padding: 24px 22px 18px}
+    h1{
+      font-size: 44px;
+      line-height: 1.05;
+      margin: 2px 0 12px;
+      letter-spacing: -.6px;
+    }
+    @media (max-width: 520px){
+      h1{font-size: 36px}
+    }
+    .lead{
+      color: var(--muted);
+      font-size: 15px;
+      margin: 0 0 18px;
+      max-width: 56ch;
+    }
+    .pillRow{display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 18px;}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      font-weight:700;
+      font-size: 13px;
+      color: rgba(255,255,255,.86);
+    }
+    .dot{width:8px; height:8px; border-radius:50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(34,197,94,.15);}
+    .ctaRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top: 6px;}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      text-decoration:none;
+      font-weight:800;
+      font-size: 14px;
+      background: rgba(255,255,255,.06);
+    }
+    .btn:hover{background: rgba(255,255,255,.09);}
+    .btnPrimary{
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      border-color: rgba(255,255,255,.18);
+      color:#fff;
+    }
+    .btnPrimary:hover{filter: brightness(1.05);}
+    .appstoreBadge{
+      height: 44px; width:auto; display:block;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+    }
+    .miniNote{color:var(--muted); font-size: 12px; margin-top: 10px}
+    .heroRight{padding: 0}
+    .mock{
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .mockTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+    }
+    .mockTop b{font-size: 13px}
+    .mockTop span{font-size: 12px; color: var(--muted)}
+    .screen{
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(600px 200px at 20% 20%, rgba(11,92,255,.28), transparent 55%),
+        radial-gradient(500px 260px at 80% 35%, rgba(56,189,248,.22), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      min-height: 260px;
+      position:relative;
+      overflow:hidden;
+        background-image:
+    linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.10)),
+    url("/assets/preview.jpg");
+  background-size: cover;
+  background-position: center;
+    }
+    .screen:after{
+      content:"";
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 46px 46px;
+      opacity: .28;
+      mask-image: radial-gradient(circle at 40% 30%, black 0%, transparent 60%);
+    }
+    .screenLabel{
+      position:absolute; left:14px; bottom:14px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(10px);
+      font-weight:800;
+      font-size: 13px;
+    }
+
+    .section{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+    .col6{grid-column: span 6;}
+    .col4{grid-column: span 4;}
+    .col8{grid-column: span 8;}
+    .col12{grid-column: span 12;}
+    @media (max-width: 980px){
+      .col6,.col4,.col8{grid-column: span 12;}
+    }
+
+    .cardPad{padding: 18px;}
+    h2{margin:0 0 10px; font-size: 18px; letter-spacing: -.2px;}
+    .muted{color:var(--muted); font-size: 14px; margin:0}
+    .featureGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 520px){
+      .featureGrid{grid-template-columns:1fr;}
+    }
+    .feature{
+      padding: 14px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+    }
+    .feature b{display:block; font-size: 14px; margin-bottom: 6px;}
+    .feature p{margin:0; color:var(--muted); font-size: 13px}
+
+    /* Daily video */
+    .dailyHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 12px;
+      margin-bottom: 10px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      font-weight:800;
+      font-size: 12px;
+      color: rgba(255,255,255,.85);
+      white-space: nowrap;
+    }
+    .tag i{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--brand2);
+      display:inline-block;
+      box-shadow: 0 0 0 3px rgba(56,189,248,.14);
+    }
+    .videoBox{
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .videoFrame{
+      width:100%;
+      aspect-ratio: 16 / 9;
+      border:0;
+      display:block;
+      background: #000;
+    }
+    .dailyText{
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--line);
+    }
+    .dailyTitle{margin:0 0 6px; font-weight:900;}
+    .dailyDesc{margin:0; color:var(--muted); font-size: 13px; white-space: pre-wrap;}
+    .dailyLinks{margin-top: 10px; display:flex; gap:10px; flex-wrap:wrap;}
+    .linkSoft{
+      color: rgba(255,255,255,.86);
+      text-decoration:none;
+      font-weight:800;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .linkSoft:hover{background: rgba(255,255,255,.08);}
+    .faq{
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    details{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      padding: 10px 12px;
+      margin: 10px 0;
+    }
+    summary{cursor:pointer; font-weight:900;}
+    details p{margin:10px 0 0; color:var(--muted); font-size: 13px}
+
+    footer{
+      margin: 22px 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+    footer a{color: rgba(255,255,255,.78); text-decoration:none; font-weight:800}
+    footer a:hover{text-decoration: underline}
+
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="/" aria-label="ClimaTok Home">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <b>ClimaTok</b>
+          <span data-i18n="brand_sub">Weather maps + forecasts</span>
+        </div>
+      </a>
+
+      <nav class="nav" aria-label="Navigation">
+        <a href="#video" data-i18n="nav_video">Daily video</a>
+        <a href="#features" data-i18n="nav_features">Features</a>
+        <a href="/app" data-i18n="nav_webapp">Web App</a>
+        <a href="/support" data-i18n="nav_support">Support</a>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <div class="card heroLeft">
+        <div class="pillRow">
+          <div class="pill"><span class="dot" aria-hidden="true"></span><span data-i18n="pill_daily">Updated daily</span></div>
+          <div class="pill" data-i18n="pill_platforms">Web + iPhone/iPad</div>
+          <div class="pill" data-i18n="pill_maps">Interactive maps</div>
+        </div>
+
+        <h1 data-i18n="hero_title">Weather, clear and visual.</h1>
+        <p class="lead" data-i18n="hero_lead">
+          Forecasts and interactive weather maps to understand what’s coming, when it arrives, and how it evolves.
+          Plus, a short daily video with the most relevant weather highlights.
+        </p>
+
+        <div class="ctaRow">
+          <a class="btn btnPrimary" href="/app" rel="noopener" data-i18n="cta_open_webapp">Open Web App</a>
+
+          <a class="btn" href="https://apps.apple.com/app/id6744102515" rel="noopener" aria-label="Download on the App Store">
+            <img src="/assets/appstore-badge.svg" alt="Download on the App Store" class="appstoreBadge">
+          </a>
+        </div>
+
+        <div class="miniNote" data-i18n="hero_tip">
+          Tip: on iPhone/iPad you’ll see the App Store banner on top to open the app directly.
+        </div>
+      </div>
+
+      <div class="card heroRight">
+        <div class="mock">
+          <div class="mockTop">
+            <div>
+              <b data-i18n="preview_title">Preview</b><br>
+              <!-- <span data-i18n="preview_sub">Example card / screenshot (replace with real images whenever you want)</span> -->
+            </div>
+            <a class="btn" style="padding:10px 12px; border-radius:12px" href="#features" data-i18n="preview_btn">See features</a>
+          </div>
+
+          <div class="screen" role="img" aria-label="ClimaTok visual mock">
+            <div class="screenLabel" data-i18n="screen_label">CAPE · Wind · Radar · Temperature</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Daily video -->
+    <section id="video" class="section">
+      <div class="card col8">
+        <div class="cardPad">
+          <div class="dailyHeader">
+            <div>
+              <h2 data-i18n="daily_h2">Daily video — Key highlights</h2>
+              <!-- <p class="muted"><span data-i18n="daily_sub">Auto-updated from</span> <code>/daily/latest.{lang}.json</code>.</p> -->
+            </div>
+            <div class="tag"><i aria-hidden="true"></i><span data-i18n="today_tag">Today</span></div>
+          </div>
+
+          <div class="videoBox">
+            <iframe id="daily-iframe" class="videoFrame" title="ClimaTok daily video" loading="lazy" allowfullscreen></iframe>
+
+            <div class="dailyText">
+              <h3 id="daily-title" class="dailyTitle" data-i18n="daily_loading_title">Loading video…</h3>
+              <p id="daily-desc" class="dailyDesc" data-i18n="daily_loading_desc">One moment.</p>
+              <div class="dailyLinks">
+                <a id="daily-open" class="linkSoft" href="#" rel="noopener" data-i18n="daily_open">Open video</a>
+                <a class="linkSoft" href="/app" rel="noopener" data-i18n="daily_open_maps">Open maps in the Web App</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq">
+            <details>
+              <summary data-i18n="faq_q1">Where do I change the daily video and description?</summary>
+              <p data-i18n="faq_a1">Just update the file <code>/daily/latest.{lang}.json</code> (see example below). The homepage will display it automatically.</p>
+            </details>
+            <details>
+              <summary data-i18n="faq_q2">Can I use TikTok instead of YouTube?</summary>
+              <p data-i18n="faq_a2">You can, but TikTok embeds sometimes fail due to third-party scripts/cookies policies. YouTube tends to be the most reliable for websites. Best setup: YouTube embed + TikTok link.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <div class="card col4">
+        <div class="cardPad">
+          <h2 data-i18n="quick_h2">Quick access</h2>
+          <p class="muted" data-i18n="quick_sub">Useful links for users and support.</p>
+
+          <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+            <a class="btn btnPrimary" href="/app" rel="noopener" data-i18n="quick_webapp">Enter Web App</a>
+            <a class="btn" href="/support" data-i18n="quick_support">Support</a>
+            <a class="btn" href="/privacy" data-i18n="quick_privacy">Privacy Policy</a>
+            <a class="btn" href="mailto:support@climatok.net">support@climatok.net</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+      <div class="card col12">
+        <div class="cardPad">
+          <h2 data-i18n="features_h2">What you can do with ClimaTok</h2>
+          <p class="muted" data-i18n="features_sub">A homepage designed to communicate value in 10 seconds.</p>
+
+          <div class="featureGrid">
+            <div class="feature">
+              <b data-i18n="f1_t">Interactive maps</b>
+              <p data-i18n="f1_d">Explore layers like temperature, wind, precipitation/radar, CAPE and more.</p>
+            </div>
+            <div class="feature">
+              <b data-i18n="f2_t">Time animation</b>
+              <p data-i18n="f2_d">Play the evolution and spot the key moment (fronts, storms, gusts).</p>
+            </div>
+            <div class="feature">
+              <b data-i18n="f3_t">Made to be readable</b>
+              <p data-i18n="f3_d">Colors and scales that make sense even if you’re not a meteorologist.</p>
+            </div>
+            <div class="feature">
+              <b data-i18n="f4_t">Web + iOS App</b>
+              <p data-i18n="f4_d">Use it in the browser or on iPhone/iPad with a native-like experience.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="yy"></span> ClimaTok</div>
+      <div>
+        <a href="/support" data-i18n="foot_support">Support</a> ·
+        <a href="/privacy" data-i18n="foot_privacy">Privacy</a> ·
+        <a href="/app" data-i18n="foot_webapp">Web App</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ---- Simple i18n (ES/EN) based on browser language ----
+    const I18N = {
+      en: {
+        brand_sub: "Weather maps + forecasts",
+        nav_video: "Daily video",
+        nav_features: "Features",
+        nav_webapp: "Web App",
+        nav_support: "Support",
+
+        pill_daily: "Updated daily",
+        pill_platforms: "Web + iPhone/iPad",
+        pill_maps: "Interactive maps",
+
+        hero_title: "Weather, clear and visual.",
+        hero_lead:
+          "Forecasts and interactive weather maps to understand what’s coming, when it arrives, and how it evolves.\nPlus, a short daily video with the most relevant weather highlights.",
+        cta_open_webapp: "Open Web App",
+        hero_tip: "Tip: on iPhone/iPad you’ll see the App Store banner on top to open the app directly.",
+
+        preview_title: "Weather Image of the Day",
+        preview_sub: "Example card / screenshot (replace with real images whenever you want)",
+        preview_btn: "See features",
+        screen_label: "CAPE · Wind · Radar · Temperature",
+
+        daily_h2: "Daily video — Key highlights",
+        daily_sub: "Auto-updated from",
+        today_tag: "Today",
+        daily_loading_title: "Loading video…",
+        daily_loading_desc: "One moment.",
+        daily_open: "Open video",
+        daily_open_maps: "Open maps in the Web App",
+
+        faq_q1: "Where do I change the daily video and description?",
+        faq_a1: "Just update the file <code>/daily/latest.{lang}.json</code> (see example below). The homepage will display it automatically.",
+        faq_q2: "Can I use TikTok instead of YouTube?",
+        faq_a2: "You can, but TikTok embeds sometimes fail due to third-party scripts/cookies policies. YouTube tends to be the most reliable for websites. Best setup: YouTube embed + TikTok link.",
+
+        quick_h2: "Quick access",
+        quick_sub: "Useful links for users and support.",
+        quick_webapp: "Enter Web App",
+        quick_support: "Support",
+        quick_privacy: "Privacy Policy",
+
+        features_h2: "What you can do with ClimaTok",
+        features_sub: "A homepage designed to communicate value in 10 seconds.",
+        f1_t: "Interactive maps",
+        f1_d: "Explore layers like temperature, wind, precipitation/radar, CAPE and more.",
+        f2_t: "Time animation",
+        f2_d: "Play the evolution and spot the key moment (fronts, storms, gusts).",
+        f3_t: "Made to be readable",
+        f3_d: "Colors and scales that make sense even if you’re not a meteorologist.",
+        f4_t: "Web + iOS App",
+        f4_d: "Use it in the browser or on iPhone/iPad with a native-like experience.",
+
+        foot_support: "Support",
+        foot_privacy: "Privacy",
+        foot_webapp: "Web App",
+
+        daily_error_title: "Daily video",
+        daily_error_desc: "Today’s content couldn’t be loaded automatically. You can open the Web App in the meantime.",
+      },
+      es: {
+        brand_sub: "Mapas del tiempo + previsión",
+        nav_video: "Vídeo diario",
+        nav_features: "Funciones",
+        nav_webapp: "Web App",
+        nav_support: "Soporte",
+
+        pill_daily: "Actualizado a diario",
+        pill_platforms: "Web + iPhone/iPad",
+        pill_maps: "Mapas interactivos",
+
+        hero_title: "La meteorología, clara y visual.",
+        hero_lead:
+          "Previsión y mapas meteorológicos interactivos para entender qué viene, cuándo llega y cómo evoluciona.\nAdemás, cada día tienes un vídeo corto con lo más relevante a nivel meteorológico.",
+        cta_open_webapp: "Abrir Web App",
+        hero_tip: "Tip: en iPhone/iPad verás el banner de App Store arriba para abrir la app directamente.",
+
+        preview_title: "La imagen del dia",
+        preview_sub: "Ejemplo de tarjeta / captura (puedes sustituirla por imágenes reales)",
+        preview_btn: "Ver funciones",
+        screen_label: "CAPE · Viento · Radar · Temperatura",
+
+        daily_h2: "Vídeo diario — Lo más relevante",
+        daily_sub: "Se actualiza automáticamente desde",
+        today_tag: "Hoy",
+        daily_loading_title: "Cargando vídeo…",
+        daily_loading_desc: "Un momento.",
+        daily_open: "Abrir vídeo",
+        daily_open_maps: "Abrir mapas en la Web App",
+
+        faq_q1: "¿Dónde se cambia el vídeo y la descripción?",
+        faq_a1: "Solo tienes que actualizar el archivo <code>/daily/latest.{lang}.json</code> (ejemplo abajo). La home se encarga de mostrarlo.",
+        faq_q2: "¿Puedo usar TikTok en vez de YouTube?",
+        faq_a2: "Se puede, pero el embed de TikTok a veces falla por políticas de cookies/terceros. YouTube suele ser lo más estable. Mejor: embed de YouTube + enlace a TikTok.",
+
+        quick_h2: "Acceso rápido",
+        quick_sub: "Enlaces útiles para usuarios y soporte.",
+        quick_webapp: "Entrar a la Web App",
+        quick_support: "Soporte",
+        quick_privacy: "Política de privacidad",
+
+        features_h2: "Qué puedes hacer con ClimaTok",
+        features_sub: "Una home pensada para explicar el valor en 10 segundos.",
+        f1_t: "Mapas interactivos",
+        f1_d: "Explora capas como temperatura, viento, precipitación/radar, CAPE y más.",
+        f2_t: "Animación temporal",
+        f2_d: "Reproduce la evolución y detecta el momento clave (frentes, tormentas, rachas).",
+        f3_t: "Precisión visual",
+        f3_d: "Colores y escalas pensadas para que “se entienda” sin ser meteorólogo.",
+        f4_t: "Web + App iOS",
+        f4_d: "Entra desde navegador o usa la app en iPhone/iPad con experiencia nativa.",
+
+        foot_support: "Soporte",
+        foot_privacy: "Privacidad",
+        foot_webapp: "Web App",
+
+        daily_error_title: "Vídeo diario",
+        daily_error_desc: "Hoy no se pudo cargar el contenido automáticamente. Puedes entrar a la Web App mientras tanto.",
+      }
+    };
+
+    function detectLang(){
+      const n = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+      return n.startsWith("es") ? "es" : "en";
+    }
+
+    const lang = detectLang();
+    document.documentElement.lang = lang;
+
+    function setMetaForLang(lang){
+      const title = lang === "es"
+        ? "ClimaTok — Mapas del tiempo y previsión"
+        : "ClimaTok — Weather maps & forecasts";
+      const desc = lang === "es"
+        ? "ClimaTok: mapas meteorológicos interactivos, previsiones y avisos. Web + iPhone/iPad. Vídeo diario con lo más relevante en meteorología."
+        : "ClimaTok: interactive weather maps, forecasts and alerts. Web + iPhone/iPad. Daily video with the most relevant weather highlights.";
+      document.title = title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute("content", desc);
+
+      // Optional: App Store badge alt text by lang
+      const badge = document.querySelector('.appstoreBadge');
+      if (badge) badge.alt = (lang === "es") ? "Descargar en App Store" : "Download on the App Store";
+    }
+
+    function applyI18n(lang){
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (!key || !(key in dict)) return;
+        // Allow <code> inside some strings
+        el.innerHTML = String(dict[key]).replaceAll("{lang}", lang);
+      });
+
+      // Replace {lang} token inside any inline code showing path
+      document.querySelectorAll("code").forEach(el => {
+        if (el.textContent.includes("{lang}")) el.textContent = el.textContent.replaceAll("{lang}", lang);
+      });
+    }
+
+    // ---- Footer year ----
+    document.getElementById('yy').textContent = String(new Date().getFullYear());
+
+    // ---- Daily video loader ----
+    // Preferred: /daily/latest.en.json and /daily/latest.es.json
+    // Fallback: /daily/latest.json
+    async function loadDaily(lang) {
+      const dict = I18N[lang] || I18N.en;
+
+      const titleEl = document.getElementById('daily-title');
+      const descEl = document.getElementById('daily-desc');
+      const iframe = document.getElementById('daily-iframe');
+      const open = document.getElementById('daily-open');
+
+      const candidates = [
+        `/daily/latest.${lang}.json`,
+        `/daily/latest.json`,
+      ];
+
+      let data = null;
+
+      try {
+        for (const url of candidates) {
+          const res = await fetch(url + "?cb=" + Date.now(), { cache: 'no-store' });
+          if (!res.ok) continue;
+          data = await res.json();
+          break;
+        }
+        if (!data) throw new Error("No daily JSON available");
+
+        titleEl.textContent = data.title || dict.daily_error_title;
+        descEl.textContent = data.description || "";
+
+        open.href = data.videoUrl || "#";
+
+        // Optional: if you add tiktokUrl in JSON, we'll show it as a second button (without breaking layout)
+        if (data.tiktokUrl) {
+          let tiktokBtn = document.getElementById("daily-tiktok");
+          if (!tiktokBtn) {
+            tiktokBtn = document.createElement("a");
+            tiktokBtn.id = "daily-tiktok";
+            tiktokBtn.className = "linkSoft";
+            tiktokBtn.rel = "noopener";
+            tiktokBtn.textContent = (lang === "es") ? "Ver en TikTok" : "View on TikTok";
+            document.querySelector(".dailyLinks")?.insertBefore(tiktokBtn, open.nextSibling);
+          }
+          tiktokBtn.href = data.tiktokUrl;
+        }
+
+// If embedUrl isn't provided but videoUrl is YouTube (watch / youtu.be / shorts), derive embed
+let embed = (data.embedUrl || "").trim();
+
+function ytEmbedFromUrl(urlStr) {
+  try {
+    const u = new URL(urlStr);
+
+    // youtu.be/<id>
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.split("/").filter(Boolean)[0];
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : "";
+    }
+
+    // youtube.com/watch?v=<id>
+    if (u.hostname.includes("youtube.com") && u.pathname === "/watch") {
+      const id = u.searchParams.get("v");
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : "";
+    }
+
+    // youtube.com/shorts/<id>
+    if (u.hostname.includes("youtube.com") && u.pathname.startsWith("/shorts/")) {
+      const id = u.pathname.split("/").filter(Boolean)[1];
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : "";
+    }
+
+    return "";
+  } catch (_) {
+    return "";
+  }
+}
+
+if (!embed && data.videoUrl) {
+  embed = ytEmbedFromUrl(data.videoUrl);
+}
+        if (embed) {
+  iframe.style.display = "block";
+
+  // Cache-buster seguro para embeds
+  const sep = embed.includes("?") ? "&" : "?";
+  const nextSrc = embed + sep + "cb=" + Date.now();
+
+  // Solo cambia si realmente es distinto (evita parpadeos)
+  if (iframe.src !== nextSrc) {
+    iframe.src = nextSrc;
+  }
+} else {
+  iframe.style.display = "none";
+}
+      } catch (e) {
+        titleEl.textContent = dict.daily_error_title;
+        descEl.textContent = dict.daily_error_desc;
+        iframe.style.display = "none";
+        open.href = "/app";
+      }
+    }
+
+    // Run
+    setMetaForLang(lang);
+    applyI18n(lang);
+    loadDaily(lang);
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+.fps-control > div {
+  position: bottom !important;
+  display: none;
+  visibility: hidden !important;
+}

@@ -1,0 +1,3996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+ <meta charset="utf-8">
+ 
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https:;
+  script-src 'self' https: 'unsafe-inline' 'unsafe-eval' blob:;
+  style-src 'self' https: 'unsafe-inline';
+  img-src 'self' https: data:;
+  connect-src 'self' https: data: ws:;
+  font-src 'self' https:;
+">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <!-- Apple Smart App Banner -->
+  <meta name="apple-itunes-app" content="app-id=6744102515, app-argument=https://climatok.net/">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>ClimaTok</title>
+  
+  <link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+  crossorigin="anonymous">
+
+
+
+  <script src="https://unpkg.com/stats.js@0.17.0/build/stats.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/deck.gl@9.1.4/dist/dist.dev.js"></script>
+  <script src="https://unpkg.com/geotiff@2.1.3/dist-browser/geotiff.js"></script>
+
+  <!-- <script src="../../dist/weatherlayers-client.umd.min.js"></script>
+  <script src="../../dist/weatherlayers-deck.umd.min.js"></script> -->
+  <script src="../weatherlayers-client.umd.min.js"></script>
+  <script src="../weatherlayers-deck.umd.min.js"></script>
+<!--
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../info-control.css">
+  <link rel="stylesheet" href="../fps-control.css"> -->
+
+
+<!-- Maptiler-> -->
+<script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.8.0/maptiler-sdk.umd.min.js"></script>
+<link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.8.0/maptiler-sdk.css" rel="stylesheet" />
+<script src="https://cdn.maptiler.com/maptiler-weather/v3.1.1/maptiler-weather.umd.min.js"></script>
+<script src="https://cdn.maptiler.com/maptiler-marker-layout/v2.0.1/maptiler-marker-layout.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+<script src="https://cdn.maptiler.com/maptiler-geocoding-control/v2.1.7/maptilersdk.umd.js"></script>
+<link href="https://cdn.maptiler.com/maptiler-geocoding-control/v2.1.7/style.css" rel="stylesheet">
+<script src="https://cdn.maptiler.com/maptiler-geocoding-control/v2.1.7/maplibregl.umd.js"></script>
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+<style id="zfix-overrides">
+  /* El time-slider y la UI por encima */
+  #time-info { position: relative; z-index: 3000 !important; }
+  #layers-container, #buttons, #variable-name, #data-source, #header, #pointer-data {
+    position: relative; z-index: 2500 !important;
+  }
+
+  /* El canvas de deck.gl por debajo y sin capturar clicks */
+  #map canvas.deckgl-canvas,
+  #map canvas[data-deckgl-canvas="true"] {
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+</style>
+
+
+
+  <style>
+  
+ /* Estilos para el banner */
+ #ads-banner {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 100vw; /* 90% del viewport width */
+    max-width: 500px; /* Límite máximo para no estirar demasiado en pantallas grandes */
+    height: auto;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center; /* Centra la imagen */
+    background: rgba(252, 251, 251, 0.925); /* Fondo oscuro para mejor contraste */
+    padding: 5px; /* Pequeño espacio interior */
+  }
+
+  #ads-banner:hover {
+    transform: translateX(-50%) scale(1.02);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.8);
+  }
+
+  #ads-banner img {
+    width: auto; /* Mantiene proporciones originales */
+    max-width: 100%; /* No excede el ancho del contenedor */
+    height: auto;
+    display: inline-block;
+    border-radius: 5px; /* Bordes redondeados para la imagen */
+  }
+
+    #header {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      width: 300px;
+    }
+    
+    #app-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 0 10px rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    
+    #app-title span {
+      color: #4FC3F7; /* Color azul para el "Tok" */
+    }
+    
+    #contact-button {
+      position: fixed;
+      top: 100px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 5px 15px;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    #contact-button:hover {
+      background: rgba(0, 119, 182, 0.9);
+    }
+    
+    /* Mover el data-source un poco más abajo para que no se solape */
+    #data-source {
+      top: 70px !important;
+    }
+    
+    /* Ajustar posición del language switcher */
+    #language-switcher {
+      top: 50px !important;
+      left: 10px !important;
+    }
+  </style>
+
+
+  <style>
+    body { margin: 0; padding: 0; font-family: sans-serif; }
+   
+#play-icon, #pause-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+/* #play-pause-bt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+} */
+
+
+
+
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; background-color:
+    #3E4048;}
+    #pointer-data{ z-index: 1; position: fixed; font-size: 20px; font-weight: 900; margin: 0px 0px 0px 0px; color: #fff; text-shadow: 0px 0px 10px #0007;}
+    /* #variable-name{ z-index: 1; position: fixed; font-size: 20px; font-weight: 500; margin: 5px 0px 0px 10px; color: #fff; text-shadow: 0px 0px 10px #0007; text-transform:capitalize;} */
+
+    #time-info {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 15px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column; /* Apila elementos verticalmente */
+  align-items: center;   /* Centra horizontalmente */
+  gap: 5px;             /* Espacio entre elementos */
+}
+
+
+
+#play-container {
+            position: absolute;
+            top: calc(40px + 5 * 40px + 90px);
+            right: 10px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+#time-text {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center; /* Centra el texto */
+    width: 100%; /* Asegura que ocupe toda la línea */
+    background-color: rgba(0, 0, 0, 0); /* Fondo negro semi-transparente */
+    color: white !important;
+    padding: 0px 0px;
+    border-radius: 5px;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+    display: inline-block; /* Para que no ocupe toda la línea */
+}
+
+#time-slider {
+    width: 260px; /* Ancho del control deslizante */
+    filter: drop-shadow(0 0 7px rgba(0, 0, 0, 0.7));
+}
+
+
+#pointer-data {
+    z-index: 1;
+    position: fixed;
+    font-size: 14px;
+    font-weight: 900;
+  
+    text-shadow: 0px 0px 10px #0007;
+    right: 10px;
+    /* transform: translateX(-50%); */
+    text-align: center;
+
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo negro traslúcido */
+    color: white !important; /* Asegura que el texto sea blanco */
+    padding: 5px 10px; /* Añade un poco de espacio alrededor del texto */
+    border-radius: 5px; /* Opcional: Redondea las esquinas */
+    text-shadow: 0px 0px 10px #0007; /* Mantén el texto con sombra para resaltar */
+}
+
+/* Caja flotante tipo bandera */
+#pointer-callout {
+  position: absolute;
+  display: none;                /* se muestra con JS */
+  padding: 6px 10px;
+  background: rgb(255, 255, 255);  /* negro 60% */
+  color: #000000;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.18);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;          /* no se parte en dos líneas */
+  pointer-events: none;         /* no interfiere con el mapa */
+  z-index: 70;                  /* por encima del mapa y controles */
+}
+
+/* Flecha con rombo rotado (mismo color que el fondo) */
+/* #pointer-callout {
+  position:absolute; z-index:70;
+  padding:6px 10px; border-radius:8px;
+  background: rgba(0,0,0,.6); color:#fff; white-space:nowrap;
+  box-shadow: 0 6px 24px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.18);
+} */
+
+/* la cola es un div aparte, rombo con clip-path (sin rotaciones) */
+#pointer-callout-tail {
+  position:absolute; z-index:69;   /* por debajo de la caja */
+  width:12px; height:12px;
+  background: rgba(0,0,0,.6);
+  clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%);
+  display:none; /* la mostramos con JS cuando haya callout */
+}
+
+
+/* la “punta” en forma de rombo */
+/* Base: rombo nítido */
+#pointer-callout::after {
+  content: "";
+  position: absolute;
+  width: 12px; height: 12px;
+  background: rgba(0,0,0,0.6);
+  clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); /* rombo */
+  /* 🔧 Reset de posiciones para evitar herencias raras */
+  top: auto; right: auto; bottom: auto; left: auto;
+}
+
+/* Caja arriba-derecha del punto → flecha en esquina abajo-izquierda */
+#pointer-callout.dir-ne::after {
+  left: -6px !important;
+  bottom: -6px !important;
+}
+
+/* Arriba-izquierda → flecha abajo-derecha */
+#pointer-callout.dir-nw::after {
+  right: -6px !important;
+  bottom: -6px !important;
+}
+
+/* Abajo-derecha → flecha arriba-izquierda */
+#pointer-callout.dir-se::after {
+  left: -6px !important;
+  top: -6px !important;
+}
+
+/* Abajo-izquierda → flecha arriba-derecha */
+#pointer-callout.dir-sw::after {
+  right: -6px !important;
+  top: -6px !important;
+}
+
+:root { --callout-gap: 8px; }
+#pointer-callout.dir-ne::after { left: calc(-6px - var(--callout-gap)); bottom: calc(-6px - var(--callout-gap)); }
+
+
+/* quita cualquier pseudo-cola previa */
+#pointer-callout::after { display:none !important; }
+
+/* y si usas la cola independiente, ocúltala */
+#pointer-callout-tail { display:none !important; }
+
+#variable-name {
+    z-index: 1000;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    font-weight: 900;
+    color: #e5ecf0; /* Azul claro como ClimaTok */
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: none;
+    align-items: center;
+    gap: 10px; /* Espacio entre icono y texto */
+}
+
+
+
+
+#pointer-data {
+    top: 10px; /* Ajusta la posición vertical según lo necesites */
+     font-weight: 900;
+}
+
+
+ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 5px;
+    }
+
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#projection {
+      display: block;
+      position: relative;
+      margin: 0px auto;
+      width: 50%;
+      height: 40px;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      text-align: center;
+      color:
+#fff;
+      background:
+#ee8a65;
+    }
+
+#wind-overlay, #coastline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Contenedor de botones (posición original) */
+
+
+#buttons {
+position: fixed;
+top: 195px;       /* Ajusta según necesidad */
+left: 10px;
+z-index: 1000;
+background: transparent;
+padding: 10px;
+border-radius: 10px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+/* Nueva posición para la leyenda */
+.maplibregl-ctrl-color-ramp {
+  position: fixed !important;
+  top: 100px;      /* Ajusta según la altura de tus botones */
+  left: 10px;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+  padding: 8px;
+   display: none;
+}
+
+
+
+#buttons {
+  list-style: none; /* Elimina los puntos de la lista */
+  padding: 0; /* Elimina el padding por defecto */
+}
+
+#buttons li {
+  list-style: none; /* Asegura que cada botón no tenga viñeta */
+}
+
+
+#time-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacio entre slider y botón */
+  width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+#time-slider {
+  flex-grow: 1; /* Ocupa el espacio restante */
+  min-width: 200px; /* Ancho mínimo para evitar que desaparezca */
+  margin: 5;
+}
+
+#play-pause-bt {
+ display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+#play-icon, #pause-icon {
+    font-size: 16px;
+}
+
+
+#data-source {
+    position: fixed;
+    top: 30px;
+    left: 10px;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: sans-serif;
+    display: none;
+}
+
+#data-source a {
+    color: #add8e6; /* Azul claro para el enlace */
+    text-decoration: none;
+}
+
+#data-source a:hover {
+    text-decoration: underline;
+}
+
+
+#crosshair {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none; /* Permite interactuar con el mapa */
+  z-index: 1001; /* Por encima del mapa */
+  display: none; /* Oculto inicialmente */
+}
+
+#crosshair::before, #crosshair::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8); /* Color blanco semitransparente */
+}
+
+/* Línea horizontal */
+#crosshair::before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+/* Línea vertical */
+#crosshair::after {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+#language-switcher {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+.flag-icon {
+  cursor: pointer;
+  margin: 0 5px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.flag-icon:hover {
+  opacity: 1;
+}
+
+
+
+
+
+.button {
+    color: white; /* Texto blanco */
+    background: rgba(0, 0, 0, 0); /* Fondo negro con 70% de opacidad */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde semi-transparente */
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background 0.3s ease; /* Transición suave al cambiar el fondo */
+}
+
+.button:hover {
+    background: rgba(0, 0, 0, 0.9); /* Fondo negro más opaco al pasar el mouse */
+}
+
+.button.active {
+    background: rgba(0, 0, 0, 0.9); /* Fondo negro más opaco para el botón activo */
+    border: 1px solid rgba(255, 255, 255, 0.7); /* Borde más visible para el botón activo */
+}
+
+÷
+
+
+
+
+
+    .color-ramp-label {
+      font-size: 16px;
+    }
+
+
+   .marker {
+        position: absolute;
+        pointer-events: none;
+         display: none;
+      }
+
+      .markerMainWeatherIcon {
+        width: 100%;
+        height: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        display: none; /* Oculto inicialmente */
+        filter: drop-shadow(0 0 10px
+rgba(0, 0, 0, 0.8));
+      }
+
+.markerTemperature {
+ display: none;
+   white-space: nowrap;       /* ✅ una sola línea */
+  overflow: hidden;          /* por si acaso */
+  text-overflow: ellipsis;   /* … si alguna vez fuese muy largo */
+  line-height: 1.1;
+  position: absolute;
+  /* bottom: 12px;
+  /* left: 50%; */
+  /* transform: translateX(-50%); */
+  z-index: 50;
+  pointer-events: none;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+
+  background: rgba(0,0,0,0.6);    /* negro 60% */
+  color: #fff;                    /* texto blanco */
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 6px 24px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.18);
+
+  font-size: clamp(16px, 2.2vw, 22px);
+  font-weight: 700;
+  text-shadow: none;              /* ya no hace falta */
+
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 56px); /* despega de la barra home y etiquetas de base */
+  left: 50%;
+  right: auto;
+  top: auto;
+  transform: translateX(-50%);
+   display: none;
+}
+.markerTemperature .unit { font-size: .85em; opacity: .9; }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .fade-in-animation {
+        animation: fadeIn 0.5s ease forwards;
+      }
+      
+      
+      /* Estilos para el modal de privacidad */
+#privacy-modal h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+#privacy-modal h3 {
+  color: #444;
+  margin: 20px 0 10px 0;
+}
+
+#privacy-modal ul {
+  padding-left: 20px;
+}
+
+#privacy-modal li {
+  margin-bottom: 5px;
+}
+
+
+
+
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .fade-in-animation {
+        animation: fadeIn 0.5s ease forwards;
+      }
+
+
+    #buttons li {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px 8px 8px; /* Ajuste para el icono */
+}
+
+#buttons li i {
+    width: 20px; /* Ancho fijo para alinear iconos */
+    text-align: center;
+}
+    
+#back-button {
+  position: fixed;
+  top: 150px; /* Ajusta si quieres más separación desde arriba */
+  left: 10px;
+  background-color: #044360;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 14px;
+  box-shadow: 0 0 8px rgba(0,0,0,0);
+  z-index: 1000;
+}
+
+    
+    /* Agrega estos estilos */
+#layers-container {
+  position: fixed;
+  top: 110px;
+  left: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#buttons {
+  display: none; /* Oculto por defecto */
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px;
+  margin: 0;
+  gap: 5px;
+}
+
+#buttons.show {
+  display: flex; /* Mostrar cuando tenga la clase 'show' */
+}
+
+#selected-layer-text {
+  margin-left: 5px;
+}
+
+#toggle-layers {
+  width: 50px; /* Ancho fijo para consistencia */
+  justify-content: center;
+  /* display: none; */
+}
+
+#now-bt{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  height:32px;
+  margin:0;
+}
+
+    #pointer-wire{
+  position:absolute; inset:0;
+  pointer-events:none;  /* no bloquea el mapa */
+  z-index:69;           /* por debajo del callout (que está ~70) */
+}
+
+/* halo para legibilidad sobre cualquier fondo */
+#wire-halo{
+  stroke: rgba(0,0,0,.45);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+#wire{
+  stroke: rgba(255,255,255,.95);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+    
+  </style>
+</head>
+
+
+<body>
+
+  <div id="header" style="display: flex; flex-direction: column; align-items: flex-start;max-width: 400px;">
+    <div id="app-title">Clima<span>Tok</span> </div>
+<button id="premium-cta" class="button" style="margin-top:10px; background: rgba(0,0,0,.75); border: 1px solid rgba(255,255,255,.25);">
+  Forecast 14 days with Advanced Layers
+</button>
+
+    <div id="local-datetime" style="
+      font-size: 20px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 0 10px rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 8px 15px;
+      border-radius: 5px;
+      margin-top: 60px;
+      display: none;
+    "></div>
+    <div id="active-layer-name" style="
+      font-size: 20px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 0 10px rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 8px 15px;
+      border-radius: 5px;
+      margin-top: 5px;
+      display: none;
+    "></div>
+  </div>
+ 
+  <div id="data-source">
+    <a href="https://www.nco.ncep.noaa.gov/pmb/products/gfs/" target="_blank" rel="noopener noreferrer">
+        Data source: NOAA/GFS Model
+    </a>
+</div>
+
+
+
+<div id="pointer-callout-tail"></div>
+
+<div id="pointer-callout" aria-live="polite"></div>
+<svg id="pointer-wire" aria-hidden="true">
+  <line id="wire-halo"></line>
+  <line id="wire"></line>
+</svg>
+
+
+<!-- <a href="javascript:history.back()" id="back-button">← BacK </a> -->
+
+  <!-- <div id="time-info">
+    <span id="time-text"></span>
+    <div id="time-controls">
+        <input type="range" id="time-slider" min="0" max="11" step="1">
+        <button id="play-pause-bt" class="button">
+            <i id="play-icon" class="fas fa-play"></i>
+            <i id="pause-icon" class="fas fa-pause" style="display: none;"></i>
+        </button>
+    </div>
+</div> -->
+
+<div id="time-info">
+  <span id="time-text"></span>
+  <div id="time-controls">
+      <button id="now-bt" class="button" >
+          <i id="back-icon" class="fas fa-step-backward"></i>
+      </button>
+    <input type="range" id="time-slider" min="0" max="11" step="1">
+     <button id="play-pause-bt" class="button">
+      <i id="play-icon" class="fas fa-play"></i>
+      <i id="pause-icon" class="fas fa-pause" style="display: none;"></i>
+    </button>
+  </div>
+</div>
+
+
+<!-- Banner de AirScreenPro -->
+<a id="ads-banner" href="https://apps.apple.com/es/app/airscreenpro/id1662877979?l=en-GB" target="_blank" rel="noopener noreferrer" aria-label="Download AirScreenPro on the App Store">
+  <img src="./airscreenpro.png" alt="AirScreenPro - Easily mirror your iPhone/iPad screen to any TV">
+</a>
+
+
+  <div id="variable-name">Detailed forecast
+
+  </div>
+  <div id="pointer-data">
+
+  </div>
+  <div id="map">
+
+  </div>
+
+
+  <div id="language-switcher">
+    <span class="flag-icon flag-icon-es" data-lang="es"></span>
+    <span class="flag-icon flag-icon-gb" data-lang="en"></span>
+  </div>
+
+  <canvas id="wind-overlay" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+  <canvas id="coastline" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+
+
+  <!-- Reemplaza el botón toggle-layers y la lista de botones con esto: -->
+<div id="layers-container">
+  <button id="toggle-layers" class="button">
+    <i class="fas fa-layer-group" style="margin-right: 0px;"></i>
+    <span id="selected-layer-text"></span>
+  </button>
+  
+  <ul id="buttons">
+    <li id="precipitation" class="btn btn-primary button">
+      <i class="fas fa-cloud-rain" style="margin-right: 8px;"></i> Precipitation
+  </li>
+  <li id="radar" class="btn btn-primary button">
+      <i class="fas fa-bolt" style="margin-right: 8px;"></i> Radar
+  </li>
+  <li id="pressure" class="btn btn-primary button">
+      <i class="fas fa-tachometer-alt" style="margin-right: 8px;"></i> Pressure
+  </li>
+  <li id="temperature" class="btn btn-primary button">
+      <i class="fas fa-thermometer-half" style="margin-right: 8px;"></i> Temperature
+  </li>
+    <li id="wind" class="btn btn-primary button">
+      <i class="fas fa-wind" style="margin-right: 8px;"></i> Wind
+  </li>
+   <!-- <li id="clouds" class="btn btn-primary button">
+      <i class="fas fa-cloud-rain" style="margin-right: 8px;"></i> Clouds
+  </li> -->
+ 
+  </ul>
+</div>
+
+  <script>
+
+// Agrega este código en tu sección JavaScript, preferiblemente al inicio del event listener DOMContentLoaded
+
+
+
+
+// Referencias a los elementos
+const toggleLayersButton = document.getElementById('toggle-layers');
+const layersButtons = document.getElementById('buttons');
+const selectedLayerText = document.getElementById('selected-layer-text');
+
+// Función para manejar el clic en cualquier botón de capa
+function handleLayerButtonClick(event) {
+  // Obtener el texto del botón clickeado (sin el icono)
+  // const buttonText = event.currentTarget.textContent.trim();
+  
+  // // Actualizar el texto del botón principal
+  // selectedLayerText.textContent = buttonText;
+  
+  // Ocultar la lista de botones
+  layersButtons.classList.remove('show');
+  
+  // Aquí iría el resto de tu lógica para cambiar las capas...
+  // (tu código existente para manejar los clicks en los botones)
+}
+
+// Evento para mostrar/ocultar la lista de capas
+toggleLayersButton.addEventListener('click', function() {
+  layersButtons.classList.toggle('show');
+});
+
+// Asignar el evento click a todos los botones de capa
+document.querySelectorAll('#buttons li').forEach(button => {
+  button.addEventListener('click', handleLayerButtonClick);
+});
+
+// Inicializar con el texto de la capa por defecto
+selectedLayerText.textContent = '';
+
+
+// Detección de idioma (los primeros 2 caracteres)
+const userLanguage = navigator.language.substring(0, 2);
+const isSpanishSpeakingCountry = ['es', 'mx', 'ar', 'co', 'pe', 've', 'cl', 'ec'].includes(userLanguage);
+
+
+// changeW
+
+const translations = {
+  es: {
+    // ... (traducciones existentes)
+    infoToggle: "ⓘ Info",
+    infoTitle: "Información Meteorológica Global Detallada",
+    infoIntro: "Esta plataforma muestra datos meteorológicos con:",
+    forecast: "Previsión de 5 días",
+    update: "Actualización cada 6 horas",
+    coverage: "Cobertura mundial con zoom local",
+    layers: "Capas disponibles:",
+    precipitation: "Precipitación",
+    wind: "Viento",
+    potentialRain: "Lluvia potencial",
+    temperature: "Temperatura",
+    pressure: "Presión atmosférica",
+    clickInfo: "Haga clic en cualquier punto para ver valores exactos",
+    source: "Fuente: NOAA/GFS Model",
+    upcoming: "Próximamente: Más capas y buscador de localidades"
+  },
+  en: {
+    // ... (existing translations)
+    infoToggle: "ⓘ Info",
+    infoTitle: "Detailed Global Weather Information",
+    infoIntro: "This platform displays meteorological data with:",
+    forecast: "5-day forecast",
+    update: "6-hour updates",
+    coverage: "Global coverage with local zoom",
+    layers: "Available layers:",
+    precipitation: "Precipitation",
+    wind: "Wind",
+    potentialRain: "Potential rain",
+    temperature: "Temperature",
+    pressure: "Atmospheric pressure",
+    clickInfo: "Click any point to view exact values",
+    source: "Source: NOAA/GFS Model",
+    upcoming: "Coming soon: More layers and location search"
+  }
+};
+
+
+// Guarda el punto fijo elegido con la "cruceta" o clic
+let pointerStickyLngLat = null;
+
+const pointerCalloutEl = document.getElementById('pointer-callout');
+const pointerCalloutElFlecha = document.getElementById('pointer-wire');
+const cruzeta = document.getElementById('crosshair');
+
+// --- Utilidad: devuelve la Date del mapa (no la del sistema) ---
+function getMapDate() {
+  const wl = weatherLayers[activeLayer]?.layer;
+  const tSec = wl?.getAnimationTime?.();
+  if (typeof tSec === "number") return new Date(tSec * 1000);
+  // Fallback: si guardas el tiempo del slider en ms
+  if (window.currentMapTimeMs) return new Date(window.currentMapTimeMs);
+  return new Date();
+}
+
+// --- Construye el HTML con los datos en ese punto (adapta a tu UI) ---
+function renderPointerInfoHTML(lngLat) {
+  const [lng, lat] = Array.isArray(lngLat) ? lngLat : [lngLat.lng, lngLat.lat];
+  const wl = weatherLayers[activeLayer]?.layer;
+
+  // Valor de la capa activa (usa tu lógica de unidades)
+  let main = '';
+  const pick = wl?.pickAt?.(lng, lat);
+  if (pick && Number.isFinite(pick.value)) {
+    if (activeLayer === 'temperature') main = `${pick.value.toFixed(1)}°C`;
+    else if (activeLayer === 'precipitation') main = `${pick.value.toFixed(1)} l/h`;
+    else if (activeLayer === 'radar') main = `${pick.value.toFixed(0)} dBZ`;
+    else main = `${pick.value.toFixed(2)}`;
+  }
+
+  // Hora del mapa (si quieres mostrarla)
+  const dt = getMapDate();
+  const hh = String(dt.getUTCHours()).padStart(2,'0');
+  const mm = String(dt.getUTCMinutes()).padStart(2,'0');
+
+  return `${main} `;
+}
+
+// cloudcoverPress()
+
+function updatePointerWire(dir, boxLeft, boxTop, boxWidth, boxHeight) {
+  const svg = document.getElementById('pointer-wire');
+  const halo = document.getElementById('wire-halo');
+  const wire = document.getElementById('wire');
+  if (!svg || !wire || !halo || !pointerStickyLngLat) {
+    if (svg) svg.style.display = 'none';
+    return;
+  }
+
+  // tamaño del contenedor del mapa
+  const cont = map.getContainer().getBoundingClientRect();
+  const w = cont.width, h = cont.height;
+
+  // dimensiona el svg al tamaño del mapa
+  svg.setAttribute('width', w);
+  svg.setAttribute('height', h);
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.style.display = 'block';
+
+  // punto 1: la cruceta (coordenadas de pantalla)
+  const p = map.project(pointerStickyLngLat);
+
+  // punto 2: esquina de la caja según la orientación (dir: 'ne','nw','se','sw')
+  // boxLeft/Top/Width/Height son coords en px relativos al viewport.
+  // Pasamos a coords relativas al contenedor del mapa:
+  const bx = boxLeft  - cont.left;
+  const by = boxTop   - cont.top;
+  const bw = boxWidth, bh = boxHeight;
+  const tailHalf = 0; // mismo offset que la “punta”
+
+  let ax = bx, ay = by;
+  switch (dir) {
+    case 'ne': // esquina bottom-left
+      ax = bx - tailHalf;
+      ay = by + bh - tailHalf;
+      break;
+    case 'nw': // esquina bottom-right
+      ax = bx + bw - tailHalf;
+      ay = by + bh - tailHalf;
+      break;
+    case 'se': // esquina top-left
+      ax = bx - tailHalf;
+      ay = by - tailHalf;
+      break;
+    case 'sw': // esquina top-right
+      ax = bx + bw - tailHalf;
+      ay = by - tailHalf;
+      break;
+  }
+
+  // pinta la línea (dos pasadas: halo + línea)
+  for (const line of [halo, wire]) {
+    line.setAttribute('x1', p.x);
+    line.setAttribute('y1', p.y);
+    line.setAttribute('x2', ax);
+    line.setAttribute('y2', ay);
+  }
+}
+
+
+// --- Coloca la banderita junto al punto, preferentemente arriba-derecha ---
+function positionPointerCallout() {
+
+  return;
+
+  if (!pointerStickyLngLat || !pointerCalloutEl) return;
+  // si está oculto, no lo fuerces a mostrarse
+  if (pointerCalloutEl.style.display === 'none') return;
+
+
+  const p = map.project(pointerStickyLngLat);
+  const containerRect = map.getContainer().getBoundingClientRect();
+
+  // mide la caja (después de haberle puesto el texto)
+  const er = pointerCalloutEl.getBoundingClientRect();
+  const margin = 12;
+
+  // posición ideal: arriba-dcha (ne)
+  let x = p.x + margin;
+  let y = p.y - er.height - margin;
+  let dir = 'ne';
+
+  // corrige si se sale por derecha/arriba
+  if (x + er.width > containerRect.width - 8) { x = p.x - er.width - margin; dir = dir.replace('e','w'); }
+  if (y < 8) { y = p.y + margin; dir = dir.replace('n','s'); }
+
+  pointerCalloutEl.classList.remove('dir-ne','dir-nw','dir-se','dir-sw');
+  pointerCalloutEl.classList.add('dir-' + dir);
+  pointerCalloutEl.style.left = `${x}px`;
+  pointerCalloutEl.style.top  = `${y}px`;
+  pointerCalloutEl.style.display = 'block';
+
+  // 🔗 dibuja/actualiza la línea
+  updatePointerWire(dir, x + containerRect.left, y + containerRect.top, er.width, er.height);
+}
+
+
+
+// --- Actualiza el contenido de la banderita con el tiempo/capa actual ---
+function refreshPointerCalloutContent() {
+  if (!pointerStickyLngLat || !pointerCalloutEl) return;
+  pointerCalloutEl.innerHTML = renderPointerInfoHTML(pointerStickyLngLat);
+  positionPointerCallout();
+}
+
+// --- API para mostrar/ocultar ---
+function showPointerCallout(lngLat) {
+  pointerStickyLngLat = Array.isArray(lngLat) ? { lng: lngLat[0], lat: lngLat[1] } : lngLat;
+  pointerCalloutEl.style.display = 'block';
+  refreshPointerCalloutContent();
+}
+
+function hidePointerCallout() {
+  pointerStickyLngLat = null;
+  if (pointerCalloutEl) pointerCalloutEl.style.display = 'none';
+}
+
+
+function updateInfoPanel(lang) {
+  const t = translations[lang];
+  
+  // Botón toggle
+  document.getElementById('info-toggle').textContent = t.infoToggle;
+  
+  // Contenido
+  const infoContent = document.getElementById('info-content');
+  infoContent.innerHTML = `
+    <h3>${t.infoTitle}</h3>
+    <p>${t.infoIntro}</p>
+    <ul>
+      <li>🗓️ ${t.forecast}</li>
+      <li>⏱️ ${t.update}</li>
+      <li>🌍 ${t.coverage}</li>
+      <li>📊 ${t.layers}
+        <ul>
+          <li>${t.precipitation}</li>
+          <li>${t.wind}</li>
+          <li>${t.potentialRain}</li>
+          <li>${t.temperature}</li>
+          <li>${t.pressure}</li>
+        </ul>
+      </li>
+    </ul>
+    <p>🔍 ${t.clickInfo}</p>
+    <p>📡 ${t.source.replace('NOAA/GFS Model', `<a href="https://www.nco.ncep.noaa.gov/pmb/products/gfs/" target="_blank">NOAA/GFS Model</a>`)}</p>
+    <p>🚀 ${t.upcoming}</p>
+  `;
+}
+
+
+
+// Cambio manual de idioma
+document.querySelectorAll('.flag-icon').forEach(flag => {
+  flag.addEventListener('click', () => {
+    const selectedLang = flag.dataset.lang;
+    updateInfoPanel(selectedLang);
+    location.search = `?lang=${selectedLang}`; // Recarga con nuevo idioma
+  });
+});
+
+// Seleccionar idioma
+const lang = isSpanishSpeakingCountry ? 'es' : 'en';
+
+
+
+      maptilersdk.config.apiKey = 'VDHg5mMM0d7W65CxLS0Y';
+      
+
+      const weatherLayers = {
+           
+        "precipitation": {
+          "layer": null,
+          "value": "value",
+          "units": "l/h"
+        },
+          
+        "radar": {
+          "layer": null,
+          "value": "value",
+          "units": "dBZ"
+        },
+        "pressure": {
+          "layer": null,
+          "value": "value",
+          "units": " hPa"
+        },
+        "clouds": {
+          "layer": null,
+          "value": "value",
+          "units": " %"
+        },
+        "temperature": {
+          "layer": null,
+          "value": "value",
+          "units": "°"
+        },
+        "wind": {
+          "layer": null,
+          "value": "speedMetersPerSecond",
+          "units": " m/s"
+        },
+        "cold": {
+          "layer": null,
+          "value": "value",
+          "units": "°C"
+        },
+      };
+
+
+      const appContainer = document.getElementById('map');
+
+
+      
+
+      const map = (window.map = new maptilersdk.Map({
+        
+        container: 'map', // container's id or the HTML element to render the map
+        style: maptilersdk.MapStyle.STREETS.DARK,  // stylesheet location
+        zoom: 3, // Ajusta el zoom
+        center: [-3.7038, 40.4168],
+        hash: true,
+        geolocateControl: false,
+        navigationControl: false,
+        projectionControl: false,
+        projection: 'mercator',
+      
+      //   bounds: [
+      //   [-180, -60], // Southwest coordinates
+      //   [180, 60] // Northeast coordinates
+      // ]
+      }));
+
+// let geoControl;
+// geoControl = new maplibregl.GeolocateControl({
+//     positionOptions: { enableHighAccuracy: true },
+//     trackUserLocation: true,
+//     showUserLocation: true,
+// });
+//  map.addControl(geoControl, 'top-right');
+
+// const gc = new maptilersdkMaptilerGeocoder.GeocodingControl();
+// map.addControl(gc, 'bottom-right');
+
+const markerContainer = document.createElement("div");
+appContainer.appendChild(markerContainer);
+
+
+        // overlaid deck.gl
+        const deckLayer = new deck.MapboxOverlay({
+        id: 'deck-clouds',
+        interleaved: false,
+        layers: [],
+      });
+      map.addControl(deckLayer);
+      const deckgl  = deckLayer._deck;
+
+
+(function(){
+  try {
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    const canvases = mapEl.getElementsByTagName('canvas');
+    for (const c of canvases) {
+      const cls = String(c.className || '');
+      // Si no parece canvas del mapa (maptiler/maplibre), lo marcamos como deck.gl
+      if (!/maptiler|maplibre|mapboxgl/i.test(cls)) {
+        c.classList.add('deckgl-canvas');
+        c.setAttribute('data-deckgl-canvas', 'true');
+        c.style.zIndex = '0';
+        c.style.pointerEvents = 'none';
+      }
+    }
+  } catch(e){ console.warn('zfix-runtime error', e); }
+})();
+
+
+
+
+      const __WL_IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const __WL_IS_IPHONE = /iPhone|iPod/i.test(navigator.userAgent);
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  const HOURS_WINDOW = 48; // cámbialo a voluntad
+
+
+   // =============== 2) LRU & CACHÉ =========================
+
+    if (__WL_IS_IPHONE) {
+      window.__WL_LRU = __makeLRU(60);
+      window.__WL_CACHE_MODE = window.__WL_LRU;
+    }
+    // Minimal LRU for WeatherLayers Client cache param
+    function __makeLRU(max = 120) {
+      const map = new Map();
+      return {
+        has: (k) => map.has(k),
+        get: (k) => {
+          if (!map.has(k)) return undefined;
+          const v = map.get(k);
+          map.delete(k); map.set(k, v);
+          return v;
+        },
+        set: (k, v) => {
+          if (map.has(k)) map.delete(k);
+          map.set(k, v);
+          if (map.size > max) {
+            const firstKey = map.keys().next().value;
+            map.delete(firstKey);
+          }
+          return true;
+        },
+        get size() { return map.size; }
+      };
+    }
+
+// ✅ Si no hay modo de caché activo, usa una LRU por defecto (amplia)
+if (!window.__WL_CACHE_MODE) {
+  window.__WL_LRU = __makeLRU(180);
+  window.__WL_CACHE_MODE = window.__WL_LRU;
+}
+
+
+
+
+
+
+    // Small helper to merge cache option
+    function __wlOpts(extra) {
+      const base = { cache: window.__WL_CACHE_MODE };
+      return extra ? Object.assign({}, extra, base) : base;
+    }
+
+
+    // Precargas 6h
+
+    // === Rolling silent prefetch (6h) ===
+const ROLLING_HOURS = 6;
+const ROLLING_PARALLEL = __WL_IS_IPHONE ? 1 : 2;
+let __rolling = { dataset: null, lastIdx: -1 };
+
+
+
+  function log(msg) {
+  // 1) Imprimir en consola normal
+  console.log(msg);
+
+  // 2) Añadir al div en pantalla
+  const box = document.getElementById('logBox');
+  if (box) {
+    const line = document.createElement('div');
+    line.textContent = msg;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function showPrecacheFinished(datasetId) {
+  const el = document.getElementById('precache-toast');
+  if (!el) return;
+  const short = (datasetId || '').split('/').pop() || 'dataset';
+  el.textContent = `✅ Precarga lista: ${short}`;
+  el.style.display = 'block';
+  // forzar reflow para habilitar la transición
+  void el.offsetWidth;
+  el.style.opacity = '1';
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => { el.style.display = 'none'; }, 700);
+  }, 5000);
+}
+
+  const rangeMax = 120 ;
+
+  async function precacheDatasets() {
+  // === UI: bloquear reproducción mientras precarga ===
+  // const playBtn1 = document.getElementById('play-button');
+  // const playBtn2 = document.getElementById('play-pause-bt');
+  // if (playBtn1) playBtn1.disabled = true;
+  // if (playBtn2) playBtn2.disabled = true;
+
+  // Toast inicial (en inglés, como pediste)
+  window.__NET_TOAST__?.show?.('Please wait, preloading all meteorology tiles…');
+
+  const IS_IPHONE = /iPhone|iPod/i.test(navigator.userAgent);
+  const IS_LOW_HEADROOM = IS_IPHONE && (
+    (navigator.hardwareConcurrency || 2) <= 3 ||
+    (window.devicePixelRatio >= 3 && Math.max(screen.width, screen.height) <= 896)
+  );
+
+  // --- Datasets a precargar ---
+  const DATASETS_ALL = [
+    'gfs/cloud_cover_entire_atmosphere'
+  ];
+  const datasetsToPreload = IS_IPHONE ? ['gfs/cloud_cover_entire_atmosphere' ] : DATASETS_ALL;
+
+  const hoursToPreload = IS_LOW_HEADROOM
+    ? Math.min(typeof rangeMax === 'number' ? rangeMax : 120, 24)
+    : (typeof rangeMax === 'number' ? rangeMax : 24);
+
+  const SLEEP_MS  = IS_LOW_HEADROOM ? 120 : (IS_IPHONE ? 40 : 0);
+  const batchSize = IS_LOW_HEADROOM ? 1   : (IS_IPHONE ? 2  : 10);
+
+  // Desactiva caché propia durante precarga
+  const prevCacheMode = window.__WL_CACHE_MODE;
+  window.__WL_CACHE_MODE = false;
+
+  // Formateador y acumulador de bytes (si mides por cliente)
+  const fmtBytes = (n) => {
+    if (!n) return '0 B';
+    const k = 1024, sizes = ['B','KB','MB','GB'];
+    const i = Math.floor(Math.log(n)/Math.log(k));
+    return `${(n/Math.pow(k,i)).toFixed(i ? 1 : 0)} ${sizes[i]}`;
+  };
+  let __bytesTotal__ = 0, __tilesOK__ = 0, __tilesPlanned__ = 0;
+
+  try {
+    (window.__NET_UI_LOG__||console.log)(`▶️ Preload: datasets=${JSON.stringify(datasetsToPreload)} hours=${hoursToPreload}`);
+
+    for (const dataset of datasetsToPreload) {
+      try {
+        log(`⏳ Loading datetimes for ${dataset}`);
+
+        const baseOpts = { datetimeStep: 1, ...__wlOpts(), cache: false };
+        const { datetimes } = await client.loadDatasetSlice(
+          dataset,
+          (WeatherLayers.offsetDatetimeRange(CURRENT_DATETIME, 0,120).join('/') || WeatherLayers.offsetDatetimeRange(CURRENT_DATETIME, 0, hoursToPreload).join('/')).split('/'),
+          baseOpts
+        );
+
+        const datetimesToLoad = datetimes.slice(0, hoursToPreload);
+        __tilesPlanned__ += datetimesToLoad.length;
+
+        for (let i = 0; i < datetimesToLoad.length; i += batchSize) {
+          const batch = datetimesToLoad.slice(i, i + batchSize);
+
+          for (const datetime of batch) {
+            try {
+              const res = await client.loadDatasetData(dataset, datetime, {
+                imageType: 'byte',
+                datetimeInterpolate: true,
+                ...__wlOpts(),
+                cache: false
+              });
+
+              // Medir bytes (si el cliente los expone; si no, quedará 0)
+              let tileBytes = 0;
+              if (res && typeof res.imageWeight === 'number' && isFinite(res.imageWeight)) {
+                tileBytes = res.imageWeight | 0;
+              } else if (res?.image) {
+                const im = res.image;
+                if (typeof im.byteLength === 'number') tileBytes = im.byteLength;
+                else if (im.data && typeof im.data.byteLength === 'number') tileBytes = im.data.byteLength;
+                else if (ArrayBuffer.isView(im) && typeof im.buffer?.byteLength === 'number') tileBytes = im.buffer.byteLength;
+              } else if (res?.image2) {
+                const im2 = res.image2;
+                if (typeof im2.byteLength === 'number') tileBytes = im2.byteLength;
+                else if (im2.data && typeof im2.data.byteLength === 'number') tileBytes = im2.data.byteLength;
+                else if (ArrayBuffer.isView(im2) && typeof im2.buffer?.byteLength === 'number') tileBytes = im2.buffer.byteLength;
+              }
+
+              (window.__NET_UI_LOG__||console.log)(`[DL] ${dataset} @ ${datetime} → ${tileBytes} B (${fmtBytes(tileBytes)})`);
+              __bytesTotal__ += (tileBytes || 0);
+              __tilesOK__++;
+
+              // Liberar referencias
+              try { res.image?.close?.(); } catch {}
+              try { res.image2?.close?.(); } catch {}
+              if (res) { res.image = undefined; res.image2 = undefined; }
+
+              try { await client.evict?.(dataset, datetime); } catch {}
+            } catch (err) {
+              console.warn(`⚠️ Error ${dataset} at ${datetime}`, err);
+              (window.__NET_UI_LOG__||console.log)(`[DL] ${dataset} @ ${datetime} → ERROR`);
+            }
+
+            if (SLEEP_MS > 0) await new Promise(r => setTimeout(r, SLEEP_MS));
+          }
+        }
+
+        try { await client.cache?.clear?.(); } catch {}
+        await new Promise(r => setTimeout(r, 0));
+        await new Promise(r => requestAnimationFrame(r));
+
+      } catch (err) {
+        console.warn(`❌ Failed to preload ${dataset}`, err);
+      }
+    }
+
+    // Mensaje final y cierre ordenado
+    const summary = `Download completed: ${fmtBytes(__bytesTotal__)} in ${__tilesOK__}/${__tilesPlanned__} tiles`;
+    (window.__NET_UI_LOG__||console.log)(`📊 TOTAL: ${fmtBytes(__bytesTotal__)} en ${__tilesOK__}/${__tilesPlanned__} planos`);
+    window.__NET_TOAST__?.update?.(summary);
+    // Oculta el toast tras 3 s
+    window.__NET_TOAST__?.hide?.(3000);
+    // Elimina también el cuadro de log (y el toast si aún existe), con un fade suave
+    setTimeout(()=> window.__NET_UI_REMOVE__?.(), 3200);
+
+    showPrecacheFinished('WeatherData');
+
+  } finally {
+    // Restaurar overlays si los usas (dejé tus líneas intactas)
+    // if (prevLayersMain)  deckglMain?.setProps({  layers: prevLayersMain  });
+    // if (prevLayersWind)  deckglWind?.setProps({  layers: prevLayersWind  });
+    // if (prevLayersCloud) deckglCloud?.setProps({ layers: prevLayersCloud });
+
+    window.__WL_CACHE_MODE = prevCacheMode;
+    // if (playBtn1) playBtn1.disabled = false;
+    // if (playBtn2) playBtn2.disabled = false;
+  }
+}
+
+  function ensureCloudsUnderPrecip() {
+  const beforeId = map.getLayer('radar')
+    ? 'radar'
+    : (map.getLayer('precipitation') ? 'precipitation' : null);
+
+  if (!beforeId) return;
+
+  // Si usas nubes WL por Deck.gl:
+  try { map.moveLayer('deck-clouds', beforeId); } catch(e){}
+
+  // Si usas nubes de MapTiler (id 'clouds'):
+  try { map.moveLayer('clouds', beforeId); } catch(e){}
+}
+
+ const CURRENT_DATETIME = new Date().toISOString();
+
+
+
+// --- WeatherLayers CLOUDS with hourly prefetch + LRU ---
+// const WLClouds = (() => {
+//   const DATASET = 'gfs/cloud_cover_entire_atmosphere';
+//   const PALETTE = [
+//     [  0, [255,255,255,  0]],
+//     [ 20, [255,255,255, 60]],
+//     [ 40, [255,255,255,110]],
+//     [ 60, [255,255,255,150]],
+//     [ 80, [255,255,255,190]],
+//     [100, [255,255,255,220]],
+//   ];
+
+//   // TUNEABLES
+//   const STEP_HOURS = 1;        // precargar cada 1 h
+//   const AHEAD_HRS  = 12;       // frames por delante
+//   const BEHIND_HRS = 3;        // frames por detrás
+//   const LRU_MAX    = 18;       // máx. frames cacheados
+//   const MAX_CONC   = 3;        // descargas simultáneas (iPhone bajo: 2)
+
+//   // STATE
+//   let datetimes = [];                // ISO strings ordenadas
+//   let visible = false;
+//   let layer = null;
+//   let lastDrawISO = null;
+
+//   // cache LRU: Map iso -> {image,image2,imageWeight,imageType,imageUnscale,bounds}
+//   const cache = new Map();
+//   const inflight = new Map();        // iso -> Promise
+//   let queue = [];                    // ISO por descargar
+//   let running = 0;
+
+//   function toISO(ms){ return new Date(ms).toISOString(); }
+//   function idxNearest(ms) {
+//     if (!datetimes.length) return -1;
+//     let best = 0, bestd = Math.abs(new Date(datetimes[0]).getTime() - ms);
+//     for (let i=1;i<datetimes.length;i++){
+//       const d = Math.abs(new Date(datetimes[i]).getTime() - ms);
+//       if (d < bestd) { best = i; bestd = d; }
+//     }
+//     return best;
+//   }
+
+//   function lruSet(iso, entry){
+//     if (cache.has(iso)) cache.delete(iso);
+//     cache.set(iso, entry);
+//     if (cache.size > LRU_MAX) {
+//       // evict el más antiguo (primer insertado)
+//       const [oldISO, old] = cache.entries().next().value || [];
+//       cache.delete(oldISO);
+//       try { old?.image?.close?.(); old?.image2?.close?.(); } catch {}
+//     }
+//   }
+
+//   async function ensureCached(iso){
+//     if (cache.has(iso)) {
+//       // refresca LRU
+//       const e = cache.get(iso);
+//       lruSet(iso, e);
+//       return e;
+//     }
+//     if (inflight.has(iso)) return inflight.get(iso);
+
+//     const p = (async () => {
+//       try {
+//         const res = await client.loadDatasetData(DATASET, iso, {
+//           imageType: 'byte',               // fuerza byte.webp/png
+//           cache: window.__WL_CACHE_MODE
+//         });
+//         const entry = {
+//           image: res.image, image2: res.image2,
+//           imageWeight: res.imageWeight, imageType: res.imageType,
+//           imageUnscale: res.imageUnscale, bounds: res.bounds
+//         };
+//         lruSet(iso, entry);
+//         return entry;
+//       } finally {
+//         inflight.delete(iso);
+//       }
+//     })();
+
+//     inflight.set(iso, p);
+//     return p;
+//   }
+
+//   function schedulePrefetch(centerIdx, ahead=AHEAD_HRS, behind=BEHIND_HRS){
+//     const want = [];
+//     // detrás
+//     for (let i=behind; i>=1; i--){
+//       const idx = centerIdx - i;
+//       if (idx >= 0) want.push(datetimes[idx]);
+//     }
+//     // delante
+//     for (let i=1; i<=ahead; i++){
+//       const idx = centerIdx + i;
+//       if (idx < datetimes.length) want.push(datetimes[idx]);
+//     }
+//     // cola sin duplicados ni cosas ya cacheadas/en vuelo
+//     for (const iso of want){
+//       if (cache.has(iso) || inflight.has(iso)) continue;
+//       if (!queue.includes(iso)) queue.push(iso);
+//     }
+//     pumpQueue();
+//   }
+
+//   async function pumpQueue(){
+//     while (running < MAX_CONC && queue.length){
+//       const iso = queue.shift();
+//       running++;
+//       ensureCached(iso).catch(()=>{}).finally(()=>{ running--; pumpQueue(); });
+//     }
+//   }
+// // new deck.MapboxOverlay
+//  function makeLayerFrom(entry){
+//   // Elige CUBIC si existe; si no, cae a LINEAR
+//   const IMAGE_INTERP =
+//     (window.WeatherLayers?.ImageInterpolation?.CUBIC) ??
+//     (window.WeatherLayers?.ImageInterpolation?.LINEAR);
+
+//   return new WeatherLayers.RasterLayer({
+//     id: 'wl-clouds',
+//     image: entry.image, image2: entry.image2,
+//     imageWeight: entry.imageWeight, imageType: entry.imageType, imageUnscale: entry.imageUnscale,
+//     bounds: entry.bounds,
+//     palette: PALETTE,
+//     opacity: 1.0,
+//     pickable: false,
+
+//     // 👇 añade esto
+//     imageInterpolation: IMAGE_INTERP,
+
+//     // 👇 elimina esta línea si la tenías:
+//     // imageSmoothing: 0,
+
+//     extensions: [new deck.ClipExtension()],
+//     clipBounds: [-181,-85.051129,181,85.051129]
+//   });
+// }
+
+
+//   return {
+//     async prepareRange(startMs, endMs){
+//       // pedir lista de datetimes cada 1h
+//       const startISO = toISO(startMs);
+//       const endISO   = toISO(endMs);
+//       const slice = await client.loadDatasetSlice(
+//         DATASET,
+//         [startISO, endISO],
+//         { datetimeStep: STEP_HOURS } // 1h
+//       );
+//       datetimes = slice.datetimes || [];
+//       // limpia estados
+//       queue = [];
+//       running = 0;
+//       inflight.clear();
+//       // no vaciamos cache para poder reaprovechar si vuelves
+//     },
+
+//     async renderAt(ms){
+//       if (!visible || !datetimes.length) return;
+//       const idx = idxNearest(ms);
+//       if (idx < 0) return;
+//       const iso = datetimes[idx];
+//       lastDrawISO = iso;
+
+//       // si ya está en cache, dibuja instantáneo
+//       const cached = cache.get(iso);
+//       if (cached){
+//         layer = makeLayerFrom(cached);
+//         deckLayer.setProps({ layers: [layer] });
+//         // sigue precalentando alrededor
+//         schedulePrefetch(idx);
+//         return;
+//       }
+
+//       // si no, dispara fetch pero no “rompas” la animación: se mantendrá el último frame
+//       ensureCached(iso).then((entry)=>{
+//         // sólo dibuja si seguimos mirando ese mismo time (evita flash si el usuario se movió)
+//         if (visible && lastDrawISO === iso){
+//           layer = makeLayerFrom(entry);
+//           deckLayer.setProps({ layers: [layer] });
+//         }
+//       }).catch(()=>{}).finally(()=>{
+//         schedulePrefetch(idx);
+//       });
+//     },
+
+//     show(on){
+//       visible = !!on;
+//       if (!on){
+//         deckLayer.setProps({ layers: [] });
+//       } else if (lastDrawISO && cache.has(lastDrawISO)){
+//         layer = makeLayerFrom(cache.get(lastDrawISO));
+//         deckLayer.setProps({ layers: [layer] });
+//       }
+//     }
+//   };
+//   })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // const map = new maptilersdk.Map({
+      //   container: appContainer,
+      //   style: maptilersdk.MapStyle.STREETS,
+      //   zoom: 4.5,
+      //   center: [2, 40],
+      //   hash: true,
+      //   projectionControl: true
+      // });
+
+
+      // document.getElementById('projection').addEventListener('click', function () {
+      //   const projection = map.getProjection()
+      //   if (projection.type === 'globe') {
+      //     map.enableMercatorProjection();
+      //   } else {
+      //     map.enableGlobeProjection();
+      //   }
+      // });
+
+
+      
+     
+
+  
+
+
+
+// Configuración de WindGL
+const windCanvas = document.getElementById('wind-overlay');
+const pxRatio = Math.max(Math.floor(window.devicePixelRatio) || 1, 2);
+windCanvas.width = map.getCanvas().width ;
+windCanvas.height = map.getCanvas().height ;
+windCanvas.style.width = '100%';
+windCanvas.style.height = '100%';
+
+// const gl = windCanvas.getContext('webgl', {antialiasing: false});
+// const wind = new WindGL(gl);
+// wind.numParticles = 65536;
+
+  
+// Potential rain
+    // __makeLRU(
+
+      const initWeatherLayer = "radar";
+
+      // const initialDate = new Date(Date.UTC(2025, 2, 5, 12, 0, 0)); // Marzo es el mes 2 porque los meses van de 0 a 11
+      // const initialTimestamp = initialDate.getTime() / 1000;
+
+
+      const timeInfoContainer = document.getElementById("time-info");
+      const timeTextDiv = document.getElementById("time-text");
+      const timeSlider = document.getElementById("time-slider");
+      const playPauseButton = document.getElementById("play-pause-bt");
+     
+      const pointerDataDiv = document.getElementById("pointer-data");
+      let pointerLngLat = null;
+      let activeLayer = null;
+      let isPlaying = false;
+      let currentTime = null;
+      let windLayerAdded = true;
+      let playfactor = 3600;
+      let lastPointerValue = ""; // Nueva variable para cache
+      let fixedCrosshair = false;
+
+      const nowButton = document.getElementById("now-bt");
+
+// === Botón calendario (derecha) -> mensaje a Swift por "sumbitToiOS" ===
+//const calendarButton = document.getElementById("play-pause-bt");
+
+
+function sendCalendarTapped() {
+  // Intenta enviar el tiempo del slider (ms si tu slider usa ms). Incluye ambos por seguridad.
+  const sliderRaw = Number(timeSlider?.value);
+  const payload = {
+    action: "calendarButtonTapped",
+    // envía ambas representaciones por si Swift las necesita
+    sliderRaw,                     // tal cual va en el input
+    ms: Number.isFinite(sliderRaw) ? sliderRaw : Date.now(),
+    sec: Number.isFinite(sliderRaw) ? Math.floor(sliderRaw / 1000) : Math.floor(Date.now() / 1000),
+    activeLayer: (typeof activeLayer !== "undefined" ? activeLayer : null)
+  };
+
+  if (window.webkit?.messageHandlers?.sumbitToiOS) {
+    try {
+      window.webkit.messageHandlers.sumbitToiOS.postMessage(payload);
+    } catch (e) {
+      console.warn("[Calendar] postMessage error:", e, payload);
+    }
+  } else {
+    console.log("[Calendar] Bridge no disponible. Payload:", payload);
+  }
+}
+
+// calendarButton?.addEventListener("click", initPlayer);
+
+
+
+// client
+
+
+function snapToHourMs(ms) {
+  const H = 3600 * 1000;
+  return Math.round(ms / H) * H;   // redondea a la hora más cercana
+}
+
+nowButton?.addEventListener("click", () => {
+
+       // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+  
+  weatherLayer.setAnimationTime(currentTime);
+  
+  // Hora actual, alineada a la hora
+  let targetMs = Date.now();
+
+  // Limita a los bounds del slider o, si no están en ms, a los del layer
+  let min = Number(timeSlider.min);
+  let max = Number(timeSlider.max);
+
+  // Si min/max aún no están en milisegundos, intenta tomarlos del layer
+  if (!Number.isFinite(min) || min < 100000) {
+    const start = weatherLayer?.getAnimationStartDate?.()?.getTime?.();
+    const end   = weatherLayer?.getAnimationEndDate?.()?.getTime?.();
+    if (Number.isFinite(start)) min = start;
+    if (Number.isFinite(end))   max = end;
+  }
+
+  if (Number.isFinite(min) && Number.isFinite(max)) {
+    if (targetMs < min) targetMs = min;
+    if (targetMs > max) targetMs = max;
+  }
+
+  // Mueve el slider y actualiza capas
+  timeSlider.value = String(targetMs);
+  const tSec = Math.floor(targetMs / 1000);
+  if (weatherLayer) {
+    weatherLayer.setAnimationTime(tSec);
+
+    if (pointerStickyLngLat) {
+  const once = () => { refreshPointerCalloutContent(); weatherLayer.off?.('tick', once); };
+  weatherLayer.on?.('tick', once);
+}
+
+
+    if (pointerStickyLngLat) refreshPointerCalloutContent();
+  }
+  // Si tienes capa de viento sincronizada:
+  try { windLayer?.setAnimationTime?.(tSec); } catch {}
+
+  // Refresca el texto de hora y cualquier lectura bajo el puntero
+  try { refreshTime?.(); } catch {}
+  try { if (pointerLngLat) updatePointerValue(pointerLngLat); } catch {}
+
+});
+
+
+
+function toggleFixedCrosshair() {
+  fixedCrosshair = isPlaying; // Se fija solo durante la animación
+   crosshair.style.border = fixedCrosshair ? "2px solid #4FC3F7" : "none"; // Cambia color cuando está fija
+}
+      
+// timeSlider.addEventListener("input"
+      const customColoramp = new maptilerweather.ColorRamp({
+        stops: [
+          { value: -65, color: [49, 54, 149, 255] },
+          { value: -40, color: [69, 117, 180, 255] },
+          { value: -30, color: [116, 173, 209, 255] },
+          { value: -20, color: [171, 217, 233, 255] },
+          { value: -10, color: [224, 243, 248, 255] },
+          { value: 0, color: [255, 255, 255, 255] },
+          { value: 12, color: [255, 255, 191, 255] },
+          { value: 20, color: [254, 224, 144, 255] },
+          { value: 25, color: [253, 174, 97, 255] },
+          { value: 30, color: [244, 109, 67, 255] },
+          { value: 40, color: [215,48,39, 255] },
+          { value: 55, color: [165, 0, 38, 255] },
+        ],
+      });
+
+const pressureColoRamp = new maptilerweather.ColorRamp({
+  stops: [
+    { value: 940,  color: [ 10,  10,  30, 255] },
+    { value: 948,  color: [ 15,  15,  50, 255] },
+    { value: 956,  color: [ 20,  25,  80, 255] },
+    { value: 964,  color: [ 25,  40, 120, 255] },
+    { value: 973,  color: [ 30,  60, 160, 255] },
+    { value: 981,  color: [ 20,  90, 180, 255] },
+    { value: 985,  color: [ 35, 105, 195, 255] },
+    { value: 989,  color: [ 45, 115, 205, 255] },
+    { value: 993,  color: [ 65, 135, 210, 255] },
+    { value: 997,  color: [ 85, 150, 215, 255] },
+    { value: 1005, color: [140, 180, 200, 255] },
+    { value: 1013, color: [210, 210, 210, 255] },
+    { value: 1021, color: [200, 170, 120, 255] },
+    { value: 1030, color: [190, 120,  80, 255] },
+    { value: 1038, color: [160,  80,  60, 255] },
+    { value: 1046, color: [130,  40,  70, 255] },
+    { value: 1054, color: [ 90,  20,  50, 255] },
+    { value: 1080, color: [ 50,  10,  30, 255] }
+  ]
+});
+
+
+      const precipitationColoRamp = new maptilerweather.ColorRamp({
+  stops: [
+    { value: 0,   color: [224, 252, 253,   0] },
+    { value: 1,   color: [  6, 223, 237, 255] },
+    { value: 2,   color: [  0, 152, 246, 255] },
+    { value: 3,   color: [  0,  14, 247, 255] },
+    { value: 4,   color: [  2, 197,  56, 255] },
+    { value: 5,   color: [  1, 220,   1, 255] },
+    { value: 6,   color: [  1, 171,   1, 255] },
+    { value: 7,   color: [ 99, 187,   0, 255] },
+    { value: 8,   color: [249, 239,   0, 255] },
+    { value: 9,   color: [234, 185,   0, 255] },
+    { value: 10,  color: [255, 143,   3, 255] },
+    { value: 20,  color: [255,  19,   0, 255] },
+    { value: 30,  color: [226,   0,   0, 255] },
+    { value: 40,  color: [201,   0,   0, 255] },
+    { value: 50,  color: [222,   0, 123, 255] },
+    { value: 60,  color: [221,  29, 236, 255] },
+    { value: 70,  color: [172, 116, 207, 255] },
+    { value: 100, color: [217, 201, 227, 255] }
+  ]
+});
+
+
+
+
+      const precipitationColorRamp = new maptilerweather.ColorRamp({
+        stops: [
+         
+        { value: 0, color: [68, 1, 84] },
+    { value: 0.13, color: [71, 44, 122] },
+    { value: 0.25, color: [59, 81, 139] },
+    { value: 0.38, color: [44, 113, 142] },
+    { value: 0.5, color: [33, 144, 141] },
+    { value: 0.63, color: [39, 173, 129] },
+    { value: 0.75, color: [92, 200, 99] },
+    { value: 0.88, color: [170, 220, 50] },
+    { value: 1, color: [253, 231, 37] },
+        ],
+      });
+
+      
+const temperatureColoRamp = new maptilerweather.ColorRamp({
+  stops: [
+    { value: -55,   color: [204, 235, 255, 255] },
+    { value: -45,   color: [179, 205, 227, 255] },
+    { value: -37.5, color: [140, 150, 198, 255] },
+    { value: -32.5, color: [140, 150, 198, 255] },
+    { value: -27.5, color: [136,  86, 167, 255] },
+    { value: -22.5, color: [129,  15, 124, 255] },
+    { value: -19,   color: [  8,  29,  88, 255] },
+    { value: -17,   color: [ 19,  39, 120, 255] },
+    { value: -15,   color: [ 37,  52, 148, 255] },
+    { value: -13,   color: [ 35,  71, 158, 255] },
+    { value: -11,   color: [ 34,  92, 167, 255] },
+    { value:  -9,   color: [ 31, 118, 180, 255] },
+    { value:  -7,   color: [ 29, 145, 192, 255] },
+    { value:  -5,   color: [ 44, 167, 197, 255] },
+    { value:  -3,   color: [ 67, 181, 197, 255] },
+    { value:  -1,   color: [ 99, 200, 197, 255] },
+    { value:   1,   color: [127, 205, 187, 255] },
+    { value:   3,   color: [152, 220, 166, 255] },
+    { value:   5,   color: [199, 233, 180, 255] },
+    { value:   7,   color: [220, 242, 198, 255] },
+    { value:   9,   color: [237, 248, 217, 255] },
+    { value:  11,   color: [245, 252, 211, 255] },
+    { value:  13,   color: [252, 255, 204, 255] },
+    { value:  15,   color: [255, 249, 182, 255] },
+    { value:  17,   color: [255, 237, 160, 255] },
+    { value:  19,   color: [255, 228, 139, 255] },
+    { value:  21,   color: [254, 217, 118, 255] },
+    { value:  23,   color: [254, 199,  97, 255] },
+    { value:  25,   color: [254, 178,  76, 255] },
+    { value:  27,   color: [254, 160,  68, 255] },
+    { value:  29,   color: [253, 141,  60, 255] },
+    { value:  31,   color: [253, 110,  51, 255] },
+    { value:  33,   color: [252,  78,  42, 255] },
+    { value:  35,   color: [242,  49,  32, 255] },
+    { value:  37,   color: [227,  26,  28, 255] },
+    { value:  39,   color: [210,  11,  32, 255] },
+    { value:  41,   color: [189,   0,  38, 255] },
+    { value:  43,   color: [159,   0,  39, 255] },
+    { value:  45,   color: [115,   0,  31, 255] },
+    { value:  47,   color: [ 76,   0,  25, 255] },
+    { value:  49,   color: [ 25,   0,  13, 255] },
+    { value:  51,   color: [ 76,   0, 153, 255] },
+    { value:  53,   color: [204,   0, 204, 255] }
+  ]
+});
+
+// dateFromPicker
+
+ timeSlider.addEventListener("input", () => {
+
+
+
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+  const ms = parseInt(timeSlider.value, 10);
+  console.log(" Valor  del timeslider al moverlo ms:", ms);
+
+  if (weatherLayer) {
+    const sec = Math.floor(ms / 1000);
+    console.log(" Valor  pasado a weatherLayer:", sec);
+    weatherLayer.setAnimationTime(sec);
+    windLayer.setAnimationTime(sec);
+   
+    // ⬇️ defer: espera al siguiente frame real de la capa
+    if (pointerStickyLngLat) {
+      const once = () => {
+        refreshPointerCalloutContent();
+        weatherLayer.off?.('tick', once);
+      };
+      weatherLayer.on?.('tick', once);
+    }
+
+
+
+ if (pointerStickyLngLat) refreshPointerCalloutContent();
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+
+  updateMarkers();
+
+  }
+
+  if (activeLayer === 'clouds' && window.WLClouds) {
+    WLClouds.renderAt(ms);   // dibuja y (por dentro) prefetch vecinos
+  }
+
+ 
+  if (pointerLngLat) updatePointerValue(pointerLngLat);
+  if (pointerStickyLngLat) refreshPointerCalloutContent();
+
+
+  // pointerCalloutEl.style.display = "none";
+  // pointerCalloutElFlecha.style.display = "none";
+  // crosshair.style.display = "none";
+  // pointerDataDiv.style.display = "none";
+  // pointerDataDiv.innerText = "";
+  if (pointerLngLat) {
+       updatePointerValue(pointerLngLat);
+
+        }
+});
+
+
+    playPauseButton.addEventListener("click", () => {
+
+     
+
+       document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+
+
+    const weatherLayer = weatherLayers[activeLayer]?.layer;
+    if (isPlaying) {
+        weatherLayer.animateByFactor(0);
+        windLayer.animateByFactor(0);
+        document.getElementById("play-icon").style.display = "inline";
+        document.getElementById("pause-icon").style.display = "none";
+    } else {
+        weatherLayer.animateByFactor(playfactor);
+        windLayer.animateByFactor(playfactor);
+        document.getElementById("play-icon").style.display = "none";
+        document.getElementById("pause-icon").style.display = "inline";
+    }
+
+    toggleFixedCrosshair();
+    isPlaying = !isPlaying;
+
+  
+  if (fixedCrosshair && pointerLngLat) {
+    updatePointerValue(pointerLngLat); // Actualiza datos para el punto fijo
+  }
+
+});
+
+
+
+       function togglePlayPauseIcon() {
+            const playIcon = document.getElementById("play-icon");
+            const pauseIcon = document.getElementById("pause-icon");
+
+            if (isPlaying) {
+                playIcon.style.display = "none";  // Oculta el icono de Play
+                pauseIcon.style.display = "inline"; // Muestra el icono de Pause
+            } else {
+                playIcon.style.display = "inline"; // Muestra el icono de Play
+                pauseIcon.style.display = "none"; // Oculta el icono de Pause
+            }
+        }
+
+
+      function pauseAnimation(weatherLayer) {
+        weatherLayer.animateByFactor(0);
+        windLayer.animateByFactor(0);
+      //  playPauseButton.innerText = "Play 3600x";
+        isPlaying = false;
+      }
+
+
+
+
+// cloudcoverPress()
+
+
+
+//iOS Wind
+// Guarda la última opacidad usada para restaurar luego
+let __windOpacityLast = 1;
+
+// Cambia la opacidad del viento de forma segura
+function setWindOpacity(op) {
+
+
+  windLayer.setOpacity(op);
+  // const wl = weatherLayers?.wind?.layer;
+  // if (!wl || typeof wl.setOpacity !== 'function') return;
+  // wl.setOpacity(op);
+   if (op > 0) __windOpacityLast = op; // recuerda la última opacidad visible
+}
+
+// API simple ON/OFF para Swift
+function hideWind()  { setWindOpacity(0); }
+function showWind()  { setWindOpacity(__windOpacityLast || 1); }
+
+// Expón al global para Swift (WKWebView.evaluateJavaScript)
+window.hideWind = hideWind;
+window.showWind = showWind;
+window.setWindOpacity = setWindOpacity; // por si quieres un control fino (0..1)
+
+
+
+
+// iOS
+// function  initPlayer() {
+//         weatherLayer.animateByFactor(playfactor);
+//         windLayer.animateByFactor(playfactor);
+//       //  playPauseButton.innerText = "Pause";
+//         isPlaying = true;
+// }
+// window.initPlayer =  initPlayer;
+
+// // iOS
+// function  pausePlayer() {
+//         weatherLayer.animateByFactor(0);
+//         windLayer.animateByFactor(0);
+//       //  playPauseButton.innerText = "Play 3600x";
+//         isPlaying = false;
+// }
+// window.pausePlayer =  pausePlayer;
+
+
+      function playAnimation(weatherLayer) {
+        weatherLayer.animateByFactor(playfactor);
+        windLayer.animateByFactor(playfactor);
+      //  playPauseButton.innerText = "Pause";
+        isPlaying = true;
+      }
+      
+        // const windLayer = new maptilerweather.WindLayer();
+      
+            // const windLayer = new maptilerweather.WindLayer({
+        // colorramp: maptilerweather.ColorRamp.builtin.NULL,
+        // color: [255, 255, 255, 0],
+        // fastColor: [255, 255, 255, 100],
+        // });
+        
+        const windLayer = new maptilerweather.WindLayer({
+     
+      colorramp: maptilerweather.ColorRamp.builtin.NULL,
+      speed: 0.001,
+      fadeFactor: 0.03,
+      maxAmount: 256,
+      density: 50,
+      color: [255, 255, 255, 0],
+      fastColor: [255, 255, 255, 100],
+    });
+
+
+
+        const myCustomRamp1 = new maptilersdk.ColorRamp({
+      stops: [
+  
+      { value:0, color: [228, 228, 228] },
+      { value:90, color: [244, 164, 244] },
+      { value:125, color: [141, 18, 141] },
+      { value:155, color: [43, 31, 106] },
+      { value:190, color: [87, 81, 172] },
+      { value:210, color: [66, 119, 191] },
+      { value:255, color: [91, 200, 76] },
+
+    
+  
+      ]
+    });
+
+    const myCustomRamp = new maptilersdk.ColorRamp({
+      stops: [
+        { value: 100, color: [252, 222, 156] },
+        { value: 500, color: [250, 164, 118] },
+        { value: 1000, color: [240, 116, 110] },
+        { value: 1500, color: [227, 79, 111] },
+        { value: 2000, color: [220, 57, 119] },
+        { value: 3000, color: [185, 37, 122] },
+        { value: 4000, color: [124, 29, 111] },
+      ]
+    });
+
+       
+
+        const customLayer = new maptilerweather.TileLayer('cold', {minZoom: 0, maxZoom: 7},
+        [
+          new maptilerweather.GradientColoringFragment({
+            decode: {
+              // We use the red (`r`) channel but in this case, the same value is repeated on green and blue
+              // so it does not really matter which channel we chose.
+              channel: 'r',
+              // Since we have encoded the square root of the density, the min and max are [0, 255]
+              // which in terms of density means from 0 to 255*255 (65025)
+              min: 0,
+              max: 255,
+            },
+            // We scale the TURBO color ramp to go from `0` to `sqrt(45000)`
+            // so that the max color of the color ramp represents a density of 45k people per sqkm
+           // stops: maptilerweather.ColorRamp.builtin.TURBO.scale(0, Math.sqrt(6400)),
+            stops: myCustomRamp,
+            smooth: true,
+            opacity: 1
+          }),
+        ]
+      );
+
+      // Description of the tileset per year
+      // https://api.maptiler.com/tiles/b0fdaf37-8eb6-448a-b220-ad2ae0749fda/?key=BMRZ94nyuUi40edFPorX#1.6/-0.49160/7.62930
+      const sources = [
+        {
+          year: 2025,
+          tilesetID: "0195b853-2533-7645-8079-83bd0f5e1859"
+        },
+        // {
+        //   year: 2026,
+        //   tilesetID: "b513cd9d-4acd-4eef-964e-acc52d079bfd"
+        // },
+        // {
+        //   year: 2027,
+        //   tilesetID: "b513cd9d-4acd-4eef-964e-acc52d079bfd"
+        // },
+        // {
+        //   year: 2028,
+        //   tilesetID: "b513cd9d-4acd-4eef-964e-acc52d079bfd"
+        // },
+        // {
+        //   year: 2029,
+        //   tilesetID: "b513cd9d-4acd-4eef-964e-acc52d079bfd"
+        // },
+      ];
+      
+      
+    //  const d = weatherLayer.getAnimationTimeDate();
+
+      sources.forEach((src) => {
+        customLayer.addSource(
+        
+    
+        // d,
+    //    Date(`2025-01-01T00:00:00.000Z`),
+          // We use the first of January for each year
+           Date.parse(`2025-03-15T00:00:00.000Z`),
+          // Note the usage of the {zxy} pattern
+          `https://api.maptiler.com/tiles/${src.tilesetID}/{zxy}.png`
+          
+        );
+      });
+
+
+// Función para convertir coordenadas geográficas a posición en el canvas
+function lngLatToCanvasPos(lngLat) {
+  const point = map.project(lngLat);
+  return [
+    point.x / map.getCanvas().width,
+    1 - point.y / map.getCanvas().height
+  ];
+}
+
+function getMapDate() {
+  const wl = weatherLayers[activeLayer]?.layer;
+  const tSec = wl?.getAnimationTime?.(); // muchos la exponen
+  if (typeof tSec === "number") return new Date(tSec * 1000);
+  return new Date(currentMapTimeMs); // fallback al último slider
+}
+
+// dBZ
+
+         const temperatureLayer = new maptilerweather.TemperatureLayer({
+           opacity: 0.7,
+         });
+
+
+        // Radar will be using the cloud color ramp and used as a cloud overlay
+        const radarLayer = new maptilerweather.RadarLayer({
+          colorramp: maptilerweather.ColorRamp.builtin.RADAR,
+        });
+
+        // From the wind layer, we only display the particles (the background is using the NULL color ramp, which is transparent).
+        // The slower particles are transparent, the fastest are opaque white
+        // const windLayer = new maptilerweather.WindLayer({
+        //   colorramp: maptilerweather.ColorRamp.builtin.NULL,
+        //   color: [255, 255, 255, 0],
+        //   fastColor: [255, 255, 255, 100],
+        // });
+
+        // The precispitation layer is created but actually not displayed.
+        // It will only be used for picking precipitation metrics at the locations of the markers
+        const precipitationLayer = new maptilerweather.PrecipitationLayer({
+          colorramp: maptilerweather.ColorRamp.builtin.NULL,
+        });
+
+        const markerManager = new maptilermarkerlayout.MarkerLayout(map, {
+          layers: ["City labels", "Place labels", "Town labels"],
+          markerSize: [40, 70],
+          offset: [0, -10],
+          markerAnchor: "center",
+          filter: (feature) => {
+            return ["city", "village", "town"].includes(
+              feature.properties.class
+            );
+          },
+        });
+
+       const markerLogicContainer = {};
+
+        let markerStatus = null;
+        
+        // This function will be used as the callback for some map events
+        const updateMarkers = () => {
+          markerStatus = markerManager.update();
+
+          if (!markerStatus) return;
+
+          // Remove the div that corresponds to removed markers
+          markerStatus.removed.forEach((pb) => {
+            const markerDiv = markerLogicContainer[pb.id];
+            delete markerLogicContainer[pb.id];
+            markerContainer.removeChild(markerDiv);
+          });
+
+          // Update the div that corresponds to updated markers
+          markerStatus.updated.forEach((pb) => {
+            const markerDiv = markerLogicContainer[pb.id];
+            updateMarkerDiv(pb, markerDiv);
+          });
+
+          // Create the div that corresponds to the new markers
+          markerStatus.new.forEach((pb) => {
+
+
+            const markerDiv = makeMarker(
+              pb,
+              temperatureLayer,
+               radarLayer,
+               precipitationLayer,
+              new Date()
+            );
+            markerLogicContainer[pb.id] = markerDiv;
+            markerContainer.appendChild(markerDiv);
+          });
+        };
+
+         const softUpdateMarkers = () => {
+          // A previous run of .update() yieding no result or not being ran at all
+          // would stop the soft update
+          
+          if (!markerStatus) return;
+
+          markerStatus.updated.forEach((abstractMarker) => {
+            markerManager.softUpdateAbstractMarker(abstractMarker);
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            updateMarkerDiv(abstractMarker, markerDiv);
+          });
+
+          markerStatus.new.forEach((abstractMarker) => {
+            markerManager.softUpdateAbstractMarker(abstractMarker);
+            const markerDiv = markerLogicContainer[abstractMarker.id];
+            updateMarkerDiv(abstractMarker, markerDiv);
+          });
+        };
+
+
+      map.on('load', function () {
+
+
+        map.setPaintProperty("Water", 'fill-color', "rgba(0, 0, 0, 0.4)");
+
+
+        map.addSource('countriesSource', {
+            type: 'vector',
+            url: 'https://demotiles.maplibre.org/tiles/tiles.json' // Reemplaza con tu fuente vectorial real
+        });
+
+        // Añade la capa de países AL FINAL de todas las capas (sin beforeId)
+        map.addLayer({
+            'id': 'countries-layer',
+            'source': 'countriesSource',
+            'source-layer': 'countries', // Asegúrate que coincida con tu fuente
+            'type': 'fill',
+            'paint': {
+                'fill-color': '#D3D3D3',
+                'fill-opacity': 0.1,
+                'fill-outline-color': '#000'
+            }
+        });
+        
+        // Opcional: Añade bordes más destacados
+        map.addLayer({
+            'id': 'countries-borders',
+            'source': 'countriesSource',
+            'source-layer': 'countries',
+            'type': 'line',
+            'paint': {
+    'line-color': '#ffffff',
+    'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        0, 0.5,
+        6, 1.5,
+        10, 2.5
+    ],
+    'line-opacity': 1.0,
+    'line-blur': 0.5
+    }
+        });
+
+
+
+
+
+    
+         initWeatherMap(initWeatherLayer);
+
+       //  map.addLayer(customLayer, 'Water');
+
+       // Traducir elementos de la UI
+// document.getElementById('variable-name').textContent = translations[lang].title;
+// document.getElementById('precipitation').textContent = translations[lang].precipitation;
+// document.getElementById('radar').textContent = translations[lang].radar;
+// document.getElementById('pressure').textContent = translations[lang].pressure;
+// document.getElementById('temperature').textContent = translations[lang].temperature;
+// document.getElementById('wind').textContent = translations[lang].wind;
+
+// Panel de información
+document.querySelector('#info-content h3').textContent = translations[lang].infoTitle;
+document.querySelector('#info-content p').textContent = translations[lang].infoText;
+document.querySelector('#data-source a').textContent = translations[lang].source;
+
+// updateInfoPanel(finalLang);
+
+
+
+
+   map.on('mouseout', function(evt) {
+        // if (!evt.originalEvent.relatedTarget) {
+        //   pointerDataDiv.innerText = "";
+        //   pointerLngLat = null;
+        // }
+      });
+
+        map.on("move",  () => {
+
+          if (pointerStickyLngLat) positionPointerCallout();
+          if (!isPlaying) {
+
+            if (activeLayer == 'wind') {
+              return
+            }
+
+        //  softUpdateMarkers();
+
+          }
+        });
+
+        map.on("moveend",  () => {
+          if (!isPlaying) {
+
+            if (activeLayer == 'wind') {
+              return
+            }
+           // updateMarkers();
+          }
+          
+        });
+
+        map.once("idle", () => {
+          if (!isPlaying) {
+            if (activeLayer == 'wind') {
+              return
+            }
+          //  updateMarkers();
+          }
+          
+        });
+
+        map.on('click', (e) => {
+      //  showPointerCallout(e.lngLat);
+        });
+
+       
+map.on('zoom', () => { if (pointerStickyLngLat) positionPointerCallout(); });
+map.on('resize', () => { if (pointerStickyLngLat) positionPointerCallout(); });
+
+// Si quieres recolocar al finalizar gestos:
+map.on('zoomend', positionPointerCallout);
+map.on('moveend', positionPointerCallout);
+
+
+
+      });
+
+
+
+ function makeMarker(
+        abstractMarker,
+        temperatureLayer,
+        radarLayer,
+        precipitationLayer,
+        date
+      ) {
+        const marker = document.createElement("div");
+        marker.classList.add("marker");
+        marker.classList.add("fade-in-animation");
+        marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+        marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+        marker.style.setProperty(
+          "transform",
+          `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`
+        );
+
+        const lonLat = abstractMarker.features[0].geometry.coordinates;
+        const temperatureData = temperatureLayer.pickAt(lonLat[0], lonLat[1]);
+        const precipitationData = precipitationLayer.pickAt(
+          lonLat[0],
+          lonLat[1]
+        );
+
+        const radarData = radarLayer.pickAt(lonLat[0], lonLat[1]);
+
+        // Actual Layer Value for Temperature
+       
+        const weatherLayer = weatherLayers[activeLayer]?.layer;
+
+      
+        const valueData = weatherLayer.pickAt(lonLat[0], lonLat[1]);
+        
+      
+        const value = valueData?.value.toFixed(1);
+
+       
+
+        let mainWeatherIconURL = "./weather-icons/";
+        const radarDBz = radarData?.value || -20;
+        const precipMmH = precipitationData?.value || 0;
+        const temperatureDeg = temperatureData?.value || 0;
+        const temperature = temperatureData?.value.toFixed(1);
+
+        let dateMap = getMapDate();
+
+        const sunPosition = SunCalc.getPosition(dateMap, lonLat[1], lonLat[0]);
+
+        if (sunPosition.altitude < 0) {
+          mainWeatherIconURL += "night-";
+        } else {
+          mainWeatherIconURL += "day-";
+        }
+
+        if (radarDBz < 0) {
+          if (precipMmH > 0.2) {
+            mainWeatherIconURL += "cloudy-";
+          } else {
+            mainWeatherIconURL += "clear-";
+          }
+        } else if (radarDBz < 10) {
+          mainWeatherIconURL += "cloudy-";
+        } else if (radarDBz < 20) {
+          mainWeatherIconURL += "overcast-";
+        } else {
+          mainWeatherIconURL += "extreme-";
+        }
+
+        if (precipMmH > 5) {
+          mainWeatherIconURL += temperatureDeg < -1 ? "snow" : "rain";
+        } else if (precipMmH > 0.2) {
+          mainWeatherIconURL += temperatureDeg < -1 ? "snow" : "drizzle";
+        } else {
+          mainWeatherIconURL += "none";
+        }
+
+        mainWeatherIconURL += ".svg";
+
+        
+        // Temperature
+         if (activeLayer == 'temperature') {
+        marker.innerHTML = `
+        <img class="markerMainWeatherIcon" src=${mainWeatherIconURL}></img>
+        <div class="markerTemperature">${value ? `${value}°` : ''}</div>`;
+        }
+
+        // Precipitation
+         if (activeLayer == 'precipitation' && value > 0) {
+        marker.innerHTML = `
+        <img class="markerMainWeatherIcon" src=${mainWeatherIconURL}></img>
+        <div class="markerTemperature">${value ? `${value} mm/h` : ''}</div>`;
+        }
+
+         // Radar
+         if (activeLayer == 'radar'  && value > 0) {
+        marker.innerHTML = `
+        <img class="markerMainWeatherIcon" src=${mainWeatherIconURL}></img>
+        <div class="markerTemperature">${value ? `${value} dBz` : ''}</div>`;
+        }
+
+         // Wind
+         if (activeLayer == 'wind'  && value > 0) {
+        marker.innerHTML = `
+        <img class="markerMainWeatherIcon" src=${mainWeatherIconURL}></img>
+        <div class="markerTemperature">${value ? `${value} Km/h` : ''}</div>`;
+        }
+
+      //   marker.innerHTML = `
+      //   <img class="markerMainWeatherIcon" src=${mainWeatherIconURL}></img>
+       
+      //   <div class="markerTemperature">${value ? `${value}°` : ''}</div>
+      // `;
+        return marker;
+      }
+
+      function updateMarkerDiv(abstractMarker, marker) {
+        marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+        marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+        marker.style.setProperty(
+          "transform",
+          `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`
+        );
+      }
+
+
+      // Actualiza SOLO el contenido (icono + cifra) de los markers existentes.
+// No recalcula layout ni crea/elimina DOM.
+function updateMarkersTick() {
+  if (!markerStatus) return;
+
+  const wl = weatherLayers[activeLayer]?.layer;
+  if (!wl) return;
+
+  // Recorremos los markers “vivos” (los que ya existen)
+  const toRefresh = []
+    .concat(markerStatus.updated || [])
+    .concat(markerStatus.new || []);
+
+  for (const pb of toRefresh) {
+    const markerDiv = markerLogicContainer[pb.id];
+    if (!markerDiv) continue;
+
+    const lonLat = pb.features[0].geometry.coordinates;
+
+    // Lecturas al tiempo actual del mapa
+    const tempData  = temperatureLayer.pickAt(lonLat[0], lonLat[1]);
+    const precip    = precipitationLayer.pickAt(lonLat[0], lonLat[1])?.value || 0;
+    const radarDBz  = radarLayer.pickAt(lonLat[0], lonLat[1])?.value ?? -20;
+    const layerVal  = wl.pickAt(lonLat[0], lonLat[1])?.value;
+
+    // Día/noche en función de la fecha del mapa (no del sistema)
+    const dateMap   = getMapDate();                     // ya lo tienes
+    const sun       = SunCalc.getPosition(dateMap, lonLat[1], lonLat[0]);
+    let icon = "./weather-icons/" + (sun.altitude < 0 ? "night-" : "day-");
+
+    // Estado del cielo según radar/precip
+    if (radarDBz < 0) icon += (precip > 0.2 ? "cloudy-" : "clear-");
+    else if (radarDBz < 10) icon += "cloudy-";
+    else if (radarDBz < 20) icon += "overcast-";
+    else icon += "extreme-";
+
+    if (precip > 5) icon += (tempData?.value < -1 ? "snow" : "rain");
+    else if (precip > 0.2) icon += (tempData?.value < -1 ? "snow" : "drizzle");
+    else icon += "none";
+
+    icon += ".svg";
+
+    // Texto según capa activa
+    let text = "";
+    if (activeLayer === "temperature" && Number.isFinite(layerVal)) {
+      text = `${layerVal.toFixed(1)}°`;
+    } else if (activeLayer === "precipitation" && layerVal > 0) {
+      text = `${layerVal.toFixed(1)} mm/h`;
+    } else if (activeLayer === "radar" && layerVal > 0) {
+      text = `${layerVal.toFixed(0)} dBz`;
+    }
+
+    // Asegura estructura y actualiza DOM
+    if (!markerDiv.querySelector(".markerMainWeatherIcon") ||
+        !markerDiv.querySelector(".markerTemperature")) {
+      markerDiv.innerHTML = `
+        <img class="markerMainWeatherIcon" />
+        <div class="markerTemperature"></div>`;
+    }
+
+    const img = markerDiv.querySelector(".markerMainWeatherIcon");
+    const box = markerDiv.querySelector(".markerTemperature");
+    if (img) img.src = icon;
+
+    if (box) {
+      box.textContent = text;
+      box.style.display = text ? "inline-flex" : "none";
+    }
+  }
+}
+
+
+function parsePickerLocal(s) {
+  s = String(s || '').trim();
+
+  // Formato HH:mm DD/MM/YYYY
+  let m = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s+(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return new Date(+m[6], +m[5]-1, +m[4], +m[1], +m[2], +(m[3]||0));
+
+  // Formato DD/MM/YYYY HH:mm
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +(m[6]||0));
+
+  // Formato ISO YYYY-MM-DDTHH:mm
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +(m[6]||0));
+
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function dateFromPicker(dateStr) {
+  console.log("📅 [dateFromPicker] recibido:", dateStr);
+
+      // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+
+  const d = parsePickerLocal(dateStr);
+  if (!d) {
+    console.error("❌ formato inválido:", dateStr);
+    return;
+  }
+
+  const ms = d.getTime();
+  console.log("➡️ [dateFromPicker] milisegundos calculados:", ms);
+
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+  // weatherLayer.setAnimationTime(currentTime);
+  // Hora actual, alineada a la hora
+  let targetMs = ms;
+  // Limita a los bounds del slider o, si no están en ms, a los del layer
+  let min = Number(timeSlider.min);
+  let max = Number(timeSlider.max);
+  // Si min/max aún no están en milisegundos, intenta tomarlos del layer
+  if (!Number.isFinite(min) || min < 100000) {
+    const start = weatherLayer?.getAnimationStartDate?.()?.getTime?.();
+    const end   = weatherLayer?.getAnimationEndDate?.()?.getTime?.();
+    if (Number.isFinite(start)) min = start;
+    if (Number.isFinite(end))   max = end;
+  }
+  if (Number.isFinite(min) && Number.isFinite(max)) {
+    if (targetMs < min) targetMs = min;
+    if (targetMs > max) targetMs = max;
+  }
+  // Mueve el slider y actualiza capas
+  timeSlider.value = String(targetMs);
+  const tSec = Math.floor(targetMs / 1000);
+  if (weatherLayer) {
+    weatherLayer.setAnimationTime(tSec);
+  }
+  // Si tienes capa de viento sincronizada:
+  try { windLayer?.setAnimationTime?.(tSec); } catch {}
+  // Refresca el texto de hora y cualquier lectura bajo el puntero
+  try { refreshTime?.(); } catch {}
+  try {
+    if (pointerLngLat) updatePointerValue(pointerLngLat);
+
+if (pointerStickyLngLat) refreshPointerCalloutContent();
+
+  } catch {}
+
+
+  
+  console.log("➡️ ISO equivalente:", d.toISOString());
+}
+
+window.dateFromPicker = dateFromPicker;
+
+
+
+
+
+
+
+
+function radar() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+  changeWeatherLayer('radar');
+}
+window.radar = radar;
+
+function windPress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+  changeWeatherLayer('wind');
+}
+window.windPress = windPress;
+
+function temperaturePress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+  changeWeatherLayer('temperature');
+}
+window.temperaturePress = temperaturePress;
+
+function pressurePress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+   changeWeatherLayer('pressure');
+}
+window.pressurePress = pressurePress;
+
+function precipitationPress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+   changeWeatherLayer('precipitation');
+}
+window.precipitationPress = precipitationPress;
+
+function radarPress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+   changeWeatherLayer('radar');
+}
+window.radarPress = radarPress;
+
+function  cloudcoverPress() {
+     // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+   changeWeatherLayer('clouds');
+ 
+  
+}
+window. cloudcoverPress =  cloudcoverPress;
+
+
+function  initPlayer() {
+
+  // Ocultar el marcador de temperatura
+  document.querySelectorAll(".markerTemperature").forEach(el => {
+    el.style.display = "none";
+  });
+   document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+    el.style.display = "none";
+  });
+
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+        weatherLayer.animateByFactor(playfactor);
+        windLayer.animateByFactor(playfactor);
+      //  playPauseButton.innerText = "Pause";
+        isPlaying = true;
+}
+window.initPlayer =  initPlayer;
+
+// iOS
+function  pausePlayer() {
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+        weatherLayer.animateByFactor(0);
+        windLayer.animateByFactor(0);
+      //  playPauseButton.innerText = "Play 3600x";
+        isPlaying = false;
+}
+window.pausePlayer =  pausePlayer;
+
+
+function  clearCloudLayer() {
+//cloudVisible = false;
+WLClouds.show(false);
+}
+window.clearCloudLayer =  clearCloudLayer;
+
+function  setCloudLayer() {
+//  cloudVisible = true;
+
+log("Aqui deberia venir la capa de nubes");
+
+}
+window.setCloudLayer = setCloudLayer;
+
+
+
+
+
+
+
+(function () {
+  function roundHour(date) {
+    const d = new Date(date);
+    d.setMinutes(0, 0, 0);
+    return d;
+  }
+
+  function nearestIndexByHour(targetMs, datetimes) {
+    let best = 0, bestDiff = Infinity;
+    for (let i = 0; i < datetimes.length; i++) {
+      const t = new Date(datetimes[i]).getTime();
+      const diff = Math.abs(t - targetMs);
+      if (diff < bestDiff) { best = i; bestDiff = diff; }
+    }
+    return best;
+  }
+ 
+
+
+
+  window.setForecastTimeFromiOS = function(iso) {
+    const d0 = new Date(iso);
+    if (isNaN(d0)) { console.warn('[iOS] Bad ISO:', iso); return false; }
+    let d = roundHour(d0);
+
+    // 1) Clamp al rango si tienes config.datetimes
+    if (window.config && Array.isArray(config.datetimes) && config.datetimes.length) {
+      const first = new Date(config.datetimes[0]).getTime();
+      const last  = new Date(config.datetimes[config.datetimes.length - 1]).getTime();
+      let t = d.getTime();
+      if (t < first) t = first;
+      if (t > last)  t = last;
+      d = new Date(t);
+    }
+
+    // 2) Aplica a la capa principal
+    const wl = window.weatherLayer || window.weatherLayers?.[window.activeLayer]?.layer;
+    if (wl && typeof wl.setAnimationTime === 'function') {
+      try { wl.setAnimationTime(d); }                      // muchas libs aceptan Date
+      catch { wl.setAnimationTime(Math.floor(d.getTime()/1000)); } // fallback a segundos
+    }
+
+    // 3) Sincroniza slider si existe
+    const slider = document.getElementById('time-slider');
+    if (slider && window.config?.datetimes?.length) {
+      const idx = nearestIndexByHour(d.getTime(), config.datetimes);
+      slider.value = String(idx);
+      // dispara tus listeners
+      slider.dispatchEvent(new Event('input',  { bubbles: true }));
+      slider.dispatchEvent(new Event('change', { bubbles: true }));
+      // Si tienes una función explícita:
+      if (typeof window.onTimeSliderChange === 'function') window.onTimeSliderChange(idx);
+    }
+
+    // 4) Actualiza etiqueta si la tienes
+    const label = document.getElementById('time-label') || document.getElementById('timeInfoContainer');
+    if (label) {
+      label.textContent = new Intl.DateTimeFormat('en-GB', {
+        weekday:'long', day:'2-digit', month:'short', year:'numeric',
+        hour:'2-digit', minute:'2-digit', hour12:false
+      }).format(d).replace(',', '');
+    }
+
+    return true;
+  };
+   window.setForecastTimeFromiOS = setForecastTimeFromiOS;
+})();
+
+
+
+
+      function playFromiOS() {
+        const weatherLayer = weatherLayers[activeLayer]?.layer;
+        if (isPlaying) {
+          weatherLayer.animateByFactor(0);
+          windLayer.animateByFactor(0);
+          // playPauseButton.innerText = "Play";
+         
+        } else {
+          weatherLayer.animateByFactor(playfactor);
+          windLayer.animateByFactor(playfactor);
+          // playPauseButton.innerText = "Pause";
+         
+         // labelsButton.disabled = true;
+        }
+        isPlaying = !isPlaying;
+      };
+
+
+    function dBZtoRainRate(dBZ) {
+      let Z = Math.pow(10, dBZ / 10);  // Convertimos dBZ a Z
+      let R = Math.pow(Z / 200, 1 / 1.6);  // Aplicamos la ecuación Z-R para lluvia general
+      return R.toFixed(2); // Redondeamos a 2 decimales
+      }
+
+      function updatePointerValue(lngLat) {
+
+  // pointerDataDiv.style.display = "";
+
+  pointerLngLat = lngLat; // Guarda la posición actual
+  
+  const weatherLayer = weatherLayers[activeLayer]?.layer;
+  const valueKey = weatherLayers[activeLayer]?.value;
+  const units = weatherLayers[activeLayer]?.units;
+
+
+  if (weatherLayer && valueKey && lngLat) {
+    const value = weatherLayer.pickAt(lngLat.lng, lngLat.lat);
+    const valueWind = windLayer.pickAt(lngLat.lng, lngLat.lat);
+    // Lógica de filtrado (cero/negativos)
+    // if (!value || (activeLayer !== "temperature" && value[valueKey] <= 0)) {
+    //   pointerDataDiv.innerText = "";
+    //   lastPointerValue = "";
+    //   return;
+    // }
+
+
+   
+
+    // Formateo del valor
+    const decimalPlaces = activeLayer === "radar" ? 1 : 2;
+    // const displayValue = value[valueKey].toFixed(decimalPlaces);
+    let displayValue;
+let displayUnits = units;
+
+if (activeLayer === "radar") {
+  const dbz = value[valueKey];
+  const rainRate = dBZtoRainRate(dbz);
+  displayValue = `${rainRate} mm/h \n ${dbz.toFixed(1)}`;
+  displayUnits = ""; // ya incluido en el string
+} else {
+  displayValue = `${value[valueKey].toFixed(2)} `;
+}
+
+
+    
+    if (!valueWind) {
+      
+       
+      // const newText = `${displayValue} ${units}`;
+      const newText = displayValue;
+
+      if (newText !== lastPointerValue) {
+      pointerDataDiv.innerText = newText;
+      lastPointerValue = newText;
+    }
+      } else {
+
+
+
+         const newText = `${displayValue} ${units} \n Max: ${(valueWind.speedKilometersPerHour.toFixed(1) * 1.8).toFixed(1)} km/h`
+         if (newText !== lastPointerValue) {
+      pointerDataDiv.innerText = newText;
+      lastPointerValue = newText;
+    }
+      }
+
+    //   if (valueWind ) {
+       
+    //    const newText = `${valueWind.speedKilometersPerHour.toFixed(1)} km/h`;
+    //    if (newText !== lastPointerValue) {
+    //    pointerDataDiv.innerText = newText;
+    //    lastPointerValue = newText;
+    //  }
+    // }
+
+
+   // const newText = `${displayValue} ${units}`;
+    
+    // Solo actualiza DOM si cambió el valor
+    // if (newText !== lastPointerValue) {
+    //   pointerDataDiv.innerText = newText;
+    //   lastPointerValue = newText;
+    // }
+  }
+}
+      
+
+
+
+
+
+
+      map.on('mousemove', (e) => {
+      //  updatePointerValue(e.lngLat);
+
+        if (!fixedCrosshair) { // Solo mueve la cruceta si no está fija
+      // moveCrosshair(e);
+      // updatePointerValue(e.lngLat);
+  }
+
+
+      });
+
+      document.getElementById('buttons').addEventListener('click', function (event) {
+        // Change layer based on button id
+        changeWeatherLayer(event.target.id);
+
+      });
+
+      function changeWeatherLayer(type) {
+
+      // Ocultar el marcador de temperatura
+      document.querySelectorAll(".markerTemperature").forEach(el => {
+        el.style.display = "none";
+      });
+      document.querySelectorAll(".markerMainWeatherIcon").forEach(el => {
+        el.style.display = "none";
+      });
+        pointerCalloutEl.style.display = "none";
+        pointerCalloutElFlecha.style.display = "none";
+        crosshair.style.display = "none";
+      //  pointerDataDiv.style.display = "none";
+      pointerDataDiv.innerText = "";
+
+
+
+        map.removeLayer(customLayer);
+
+
+        if (windLayerAdded) {
+
+          windLayer.animateByFactor(playfactor);
+          map.addLayer(windLayer);
+          windLayerAdded = false;
+        }
+        
+        if (type !== activeLayer) {
+        if (activeLayer === 'clouds') WLClouds.show(false);
+        // ... (tu lógica existente)
+        // Si entramos en nubes -> mostrar WL
+        if (type === 'clouds') WLClouds.show(true);
+
+          if (map.getLayer(activeLayer)) {
+            const activeWeatherLayer = weatherLayers[activeLayer]?.layer;
+            if (activeWeatherLayer) {
+              currentTime = activeWeatherLayer.getAnimationTime();
+              map.setLayoutProperty(activeLayer, 'visibility', 'none');
+            }
+          }
+          activeLayer = type;
+          const weatherLayer = weatherLayers[activeLayer].layer || createWeatherLayer(activeLayer);
+          if (map.getLayer(activeLayer)) {
+            map.setLayoutProperty(activeLayer, 'visibility', 'visible');
+          } else {
+            map.addLayer(weatherLayer, 'Water');
+            
+          }
+          changeLayerLabel(activeLayer);
+          activateButton(activeLayer);
+          changeLayerAnimation(weatherLayer);
+          pointerDataDiv.innerText = "";
+          pointerLngLat = null;
+          return weatherLayer;
+        }
+      }
+
+// TEMPERATURE
+
+
+      function activateButton(activeLayer) {
+        const buttons = document.getElementsByClassName('button');
+        for (let i = 0; i < buttons.length; i++) {
+          const btn = buttons[i];
+          if (btn.id === activeLayer) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        }
+      }
+
+// timeSlider.addEventListener
+
+      function changeLayerAnimation(weatherLayer) {
+
+        weatherLayer.setAnimationTime(parseInt(timeSlider.value / 1000));
+
+        if (isPlaying) {
+          playAnimation(weatherLayer);
+        } else {
+          pauseAnimation(weatherLayer);
+        }
+
+        updateMarkers();
+
+      }
+
+      function createWeatherLayer(type){
+        let weatherLayer = null;
+        switch (type) {
+            
+            case 'precipitation':
+            weatherLayer = new maptilerweather.PrecipitationLayer({
+              opacity: 1.0,
+                id: 'precipitation',
+                 colorramp: precipitationColoRamp
+            });
+            
+            break;
+
+            case 'cold':
+            weatherLayer = customLayer
+            
+            break;
+
+          case 'radar':
+            weatherLayer = new maptilerweather.RadarLayer({
+              opacity: 0.8,
+              id: 'radar',
+            
+            });
+            
+            break;
+
+          case 'pressure':
+            weatherLayer = new maptilerweather.PressureLayer({
+              opacity: 1.0,
+              id: 'pressure',
+              colorramp: pressureColoRamp
+            });
+            break;
+
+           case 'clouds':
+             weatherLayer = new maptilerweather.RadarLayer({
+                 opacity: 1.0,
+         colorramp: maptilerweather.ColorRamp.builtin.RADAR_CLOUD,
+               id: 'clouds'
+             });
+             break;
+
+          case 'temperature':
+            weatherLayer = new maptilerweather.TemperatureLayer({
+               
+              opacity: 1.0,
+              colorramp: maptilerweather.ColorRamp.builtin.TEMPERATURE_2.scale(-50, 50),
+              id: 'temperature'
+            });
+            break;
+
+
+          case 'wind':
+            weatherLayer = new maptilerweather.WindLayer({
+                id: 'wind'});
+            break;
+
+
+        }
+
+        // Called when the animation is progressing
+        weatherLayer.on("tick", event => {
+          refreshTime();
+           // Fuerza la actualización del pointer incluso durante animación
+        if (pointerLngLat) {
+       updatePointerValue(pointerLngLat);
+
+        }
+
+if (pointerStickyLngLat) refreshPointerCalloutContent();
+
+        });
+
+
+
+        // Called when the time is manually set
+        weatherLayer.on("animationTimeSet", event => {
+          refreshTime();
+        });
+
+        // Event called when all the datasource for the next days are added and ready.
+        // From now on, the layer nows the start and end dates.
+        weatherLayer.on("sourceReady", event => {
+
+
+          const startDate = weatherLayer.getAnimationStartDate();
+          const endDate = weatherLayer.getAnimationEndDate();
+          if (timeSlider.min > 0){
+            weatherLayer.setAnimationTime(currentTime);
+            changeLayerAnimation(weatherLayer);
+          } else {
+            const currentDate = weatherLayer.getAnimationTimeDate();
+           
+            timeSlider.min = +startDate;
+            timeSlider.max = +endDate;
+            timeSlider.value = +currentDate;
+          }
+
+          
+        });
+
+        weatherLayers[type].layer = weatherLayer;
+        return weatherLayer;
+      }
+
+     
+      // Update the date time display
+      function refreshTime() {
+
+        const weatherLayer = weatherLayers[activeLayer]?.layer;
+        
+                if (weatherLayer) {
+
+          const weathName = weatherLayer.id;
+          if (weathName == "cold") {
+            return
+          }
+            
+          console.log("WEATHER:", weatherLayer);
+        const d = weatherLayer.getAnimationTimeDate();
+        
+            console.log("time:", d);
+
+         if (!d || isNaN(d.getTime?.())) {
+      console.warn("❌ Fecha inválida en refreshTime:", d);
+      return;
+    }
+
+        timeTextDiv.innerText = d.toString();
+        timeSlider.value = +d;
+
+           // Formato personalizado: "Sunday 11, 13:00"
+        const options = { weekday: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).format(d);
+          timeTextDiv.innerText = formattedDate;
+      document.getElementById("local-datetime").innerText = formattedDate;
+        
+       }
+
+ 
+            
+      }
+
+      let legendControl; // Variable global para almacenar el control de la leyenda
+
+   function changeLayerLabel(type) {
+    let labelText = "";
+    let newColorRamp = null;
+    let units = ""; // Variable para almacenar las unidades correctas
+
+    switch (type) {
+        
+          case "precipitation":
+            labelText = "PRECIPITATION 1h";
+          // newColorRamp = maptilerweather.ColorRamp.builtin.PRECIPITATION;
+            newColorRamp = maptilerweather.ColorRamp.builtin.PRECIPITATION;
+       
+            units = "mm/h"; // Unidades de precipitación
+            break;
+        
+        case "radar":
+            labelText = "RADAR 1h";
+            newColorRamp = maptilerweather.ColorRamp.builtin.RADAR.scale(0,50);
+            units = "dBz"; // Unidades de precipitación
+            break;
+        case "temperature":
+            labelText = "TEMPERATURE";
+            newColorRamp = maptilerweather.ColorRamp.builtin.TEMPERATURE_3;
+            units = "°C"; // Unidades de temperatura
+            break;
+        case "pressure":
+            labelText = "PRESSURE";
+            newColorRamp = maptilerweather.ColorRamp.builtin.PRESSURE_4;
+            units = "hPa"; // Unidades de presión
+            break;
+        case "wind":
+            labelText = "WIND";
+            newColorRamp = maptilerweather.ColorRamp.builtin.DENSITY.scale(0,40);
+            units = "m/s"; // Unidades de viento
+            break;
+            
+
+            case "cold":
+            labelText = "COLD IN HIGH LEVES";
+            newColorRamp = maptilerweather.ColorRamp.builtin.WIND.scale(40);
+            units = "mm/h"; // Unidades de precipitacion
+            break;
+        default:
+            labelText = "Weather Layer";
+            newColorRamp = null;
+            units = ""; // No hay unidades predeterminadas
+    }
+
+    // Cambiar el nombre de la capa en la UI
+    document.getElementById("variable-name").innerText = labelText;
+    document.getElementById("active-layer-name").innerText = labelText.toLowerCase().replace(/^\w/, c => c.toUpperCase());
+
+
+
+    // Remover la leyenda anterior si existe
+    if (legendControl) {
+        map.removeControl(legendControl);
+    }
+
+    // Agregar la nueva leyenda con la escala de colores correcta
+    if (newColorRamp) {
+
+
+        legendControl = new colorRampLegendControl({ colorRamp: newColorRamp, units: units });
+        map.addControl(legendControl, 'top-left');
+    }
+}
+
+      function initWeatherMap(type) {
+        const weatherLayer = changeWeatherLayer(type);
+      }
+
+
+      class colorRampLegendControl {
+        constructor(options) {
+          this._options = {...options};
+          this._container = document.createElement("div");
+          this._container.classList.add("maplibregl-ctrl");
+          this._container.classList.add("maplibregl-ctrl-color-ramp");
+        }
+     
+        onAdd(map) {
+    this._map = map;
+    const colorramp = this._options.colorRamp;
+
+    // Crear un nuevo canvas con dimensiones correctas
+    const canvas = document.createElement("canvas");
+    canvas.width = 20;  // Estrecho
+    canvas.height = 100; // Alto
+
+    // Obtener el contexto 2D del canvas
+    const ctx = canvas.getContext("2d");
+
+    // Dibujar la imagen del color ramp en vertical
+    const originalCanvas = colorramp.getCanvasStrip();
+    ctx.translate(0, canvas.height); // Mover el punto de inicio
+    ctx.rotate(-Math.PI / 2); // Rotar -90° para que se vea correctamente
+    ctx.drawImage(originalCanvas, 0, 0, canvas.height, canvas.width);
+
+      // Aplicar estilos
+      canvas.style.border = "1px solid #FFFFFF"; // Borde blanco para resaltar en fondo negro
+    canvas.style.display = "block";
+
+    const bounds = colorramp.getBounds();
+
+    // Crear un contenedor para la barra de colores y las etiquetas
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column"; // Alinear en columna
+    wrapper.style.alignItems = "center";
+    wrapper.style.gap = "0px";
+    wrapper.style.background = "none"; // Fondo negro
+    wrapper.style.padding = "0px"; // Espacio alrededor
+    wrapper.style.borderRadius = "0px"; // Bordes redondeados
+    wrapper.style.boxShadow = "none";
+
+ // Crear la etiqueta máxima (arriba)
+const maxLabel = document.createElement("span");
+maxLabel.textContent = `${bounds.max} ${this._options.units}`; // Unidades dinámicas
+maxLabel.style.fontSize = "10px";
+maxLabel.style.color = "white";
+maxLabel.style.fontWeight = "bold";
+
+// Crear la etiqueta mínima (abajo)
+const minLabel = document.createElement("span");
+minLabel.textContent = `${bounds.min} ${this._options.units}`; // Unidades dinámicas
+minLabel.style.fontSize = "10px";
+minLabel.style.color = "white";
+minLabel.style.fontWeight = "bold";
+
+
+    // Agregar elementos al contenedor en orden vertical
+    wrapper.appendChild(maxLabel);
+    wrapper.appendChild(canvas);
+    wrapper.appendChild(minLabel);
+
+    this._container.appendChild(wrapper);
+    return this._container;
+}
+
+
+
+
+
+        onRemove() {
+          if (!this._map || !this._container) {
+            return;
+          }
+          this._container.parentNode.removeChild(this._container);
+          this._map = undefined;
+          delete this._map;
+        }
+      }
+
+     // map.addControl(new colorRampLegendControl({colorRamp:  maptilerweather.ColorRamp.builtin.RADAR}), 'top-left');
+
+
+      
+  </script>
+
+
+
+<!-- Añade esto antes del cierre de </body> -->
+<div id="info-description">
+  <div id="info-toggle" class="button">ⓘ</div>
+  <div id="info-content">
+    <h3>Global Weather Information</h3>
+    <p>This platform displays meteorological data with:</p>
+    <ul>
+      <li>🗓️ 5-day forecast</li>
+      <li>⏱️ 6-hour updates</li>
+      <li>🌍 Global coverage with local zoom</li>
+      <li>📊 Available layers:
+        <ul>
+          <li>Precipitation</li>
+          <li>Wind</li>
+          <li>Temperature</li>
+          <li>Atmospheric Pressure</li>
+        </ul>
+      </li>
+    </ul>
+    <p>🔍 Click any point to view exact values.</p>
+    <p>📡 source: <a href="https://www.nco.ncep.noaa.gov/pmb/products/gfs/" target="_blank">NOAA/GFS Model</a></p>
+    <p>🚀 Coming soon: More layers and location search</p>
+  </div>
+</div>
+
+<style>
+  #info-description {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    max-width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    color: white;
+    padding: 0px;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 0px 10px rgba(0,0,0,0.3);
+     display: none;
+  }
+
+  #info-toggle:hover {
+  background: rgba(0, 119, 182, 0.9);
+}
+
+#info-content {
+    display: none;
+    padding: 10px; /* Aumentamos el padding general */
+    padding-right: 20px; /* Extra padding a la derecha */
+    padding-left: 15px; /* Padding izquierdo consistente */
+    border-top: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+#info-toggle.active + #info-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Personalización del scroll (opcional) */
+#info-content::-webkit-scrollbar {
+    width: 5px;
+}
+#info-content::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+
+#info-content h3 {
+    margin: 0 0 10px 0; /* Margen inferior para separar del texto */
+    padding: 0;
+}
+
+#info-content ul {
+    padding-left: 20px; /* Sangría para listas */
+    margin: 10px 0; /* Espacio arriba y abajo */
+}
+
+#info-content p {
+    margin: 8px 0; /* Espaciado para párrafos */
+    line-height: 1.4; /* Mejor legibilidad */
+}
+
+#info-content a {
+    word-break: break-word; /* Evita desbordamiento de URLs largas */
+}
+
+  #info-content a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div id="crosshair"></div>
+
+
+<script>
+  // document.getElementById('info-toggle').addEventListener('click', function() {
+  //   const content = document.getElementById('info-content');
+  //   content.style.display = content.style.display === 'block' ? 'none' : 'block';
+  // });
+
+  document.getElementById('info-toggle').addEventListener('click', function() {
+    this.classList.toggle('active');
+    const content = document.getElementById('info-content');
+    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+});
+
+
+  const crosshair = document.getElementById('crosshair');
+  let selectedLngLat = null;
+
+  function setCrosshairAtLngLat(lngLat) {
+    const p = map.project(lngLat);
+    crosshair.style.display = 'block';
+    crosshair.style.left = `${p.x - 10}px`;
+    crosshair.style.top  = `${p.y - 10}px`;
+  }
+
+  function selectPoint(lngLat) {
+    selectedLngLat = lngLat;
+    setCrosshairAtLngLat(lngLat);
+    updatePointerValue(lngLat);  // <-- solo aquí actualizamos datos
+  }
+
+
+
+  // --- Desktop: click fija punto y actualiza ---
+  map.on('click', (e) => {
+    selectPoint(e.lngLat);
+  });
+
+  // --- Móvil: detectar TAP (no arrastre) ---
+  let touchStart = null;
+  map.on('touchstart', (e) => {
+    const t = e.originalEvent.touches?.[0];
+    if (!t) return;
+    touchStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+  });
+
+  map.on('touchend', (e) => {
+    const t = e.originalEvent.changedTouches?.[0];
+    if (!t || !touchStart) return;
+
+    const dt = Date.now() - touchStart.time;
+    const dx = t.clientX - touchStart.x;
+    const dy = t.clientY - touchStart.y;
+    const moved2 = dx*dx + dy*dy;
+
+    // tap si fue rápido y casi sin movimiento
+    const isTap = dt < 300 && moved2 < (12*12);
+
+    if (isTap) {
+      const rect = map.getCanvas().getBoundingClientRect();
+      const x = t.clientX - rect.left;
+      const y = t.clientY - rect.top;
+      const lngLat = map.unproject([x, y]);
+      selectPoint(lngLat);
+    }
+
+    touchStart = null;
+  });
+
+  // --- Importante: NO actualices en movimiento ---
+  // Si tenías algo como:
+  // map.on('mousemove', e => updatePointerValue(e.lngLat));
+  // map.on('touchmove',  e => updatePointerValue(e.lngLat));
+  // elimínalo o coméntalo para que NO cambien los datos al mover el puntero.
+
+  // (Opcional) Si el mapa se redimensiona/rota/zoomea, reposiciona la cruceta en el mismo punto seleccionado
+  map.on('move', () => {
+    if (selectedLngLat) setCrosshairAtLngLat(selectedLngLat);
+  });
+
+
+
+</script>
+
+
+<script>
+  // Agregar este script para manejar el botón de contacto
+  // document.getElementById('contact-button').addEventListener('click', function() {
+  //   // Aquí puedes redirigir a un formulario de contacto o mostrar un modal
+  //   const email = 'jgurban@gmail.com';
+  //   const subject = 'Question about ClimaTok';
+  //   window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+    
+  //   // Alternativa: mostrar un modal de contacto
+  //   // alert("Por favor envíe sus consultas a: contacto@climatok.com");
+  // });
+  // Alternativa con modal de contacto
+// document.getElementById('contact-button').addEventListener('click', function() {
+//   const modal = document.createElement('div');
+//   modal.innerHTML = `
+//     <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; display:flex; justify-content:center; align-items:center;">
+//       <div style="background:white; padding:20px; border-radius:8px; max-width:400px;">
+//         <h3>Contact ClimaTok</h3>
+//         <form id="contact-form">
+//           <input type="text" placeholder="Name" style="width:100%; margin-bottom:10px; padding:8px;">
+//           <input type="email" placeholder="Email" style="width:100%; margin-bottom:10px; padding:8px;">
+//           <textarea placeholder="Message" style="width:100%; height:100px; margin-bottom:10px; padding:8px;"></textarea>
+//           <button type="submit" style="background:#4FC3F7; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Send</button>
+//         </form>
+//         <button onclick="this.parentNode.parentNode.remove()" style="margin-top:10px; background:#ccc; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Close</button>
+//       </div>
+//     </div>
+//   `;
+//   document.body.appendChild(modal);
+  
+//   // Aquí podrías agregar la lógica para enviar el formulario
+//   document.getElementById('contact-form').addEventListener('submit', function(e) {
+//     e.preventDefault();
+//     alert('Thank you for your message! We will get back to you soon.');
+//     modal.remove();
+//   });
+// });
+
+
+// Cookie Consent
+// document.addEventListener("DOMContentLoaded", function() {
+//   const consentBanner = document.getElementById("cookie-consent");
+//   const acceptBtn = document.getElementById("accept-cookies");
+  
+//   if (!localStorage.getItem("cookiesAccepted")) {
+//     consentBanner.style.display = "block";
+//   }
+  
+//   acceptBtn.addEventListener("click", function() {
+//     localStorage.setItem("cookiesAccepted", "true");
+//     consentBanner.style.display = "none";
+//     // Initialize analytics/ads here if needed
+//   });
+  
+//   // Initialize services only if consented
+//   if (localStorage.getItem("cookiesAccepted")) {
+//     initTracking();
+//   }
+// });
+
+function initTracking() {
+  // Your existing analytics code here
+  // gtag('config', 'G-8XQDWTD6YR');
+}
+
+
+
+</script>
+
+<!-- Botón Flotante de Cookies -->
+<div id="cookie-consent" style="position:fixed;bottom:20px;right:20px;background:rgba(0,0,0,0.8);color:white;padding:15px;border-radius:5px;max-width:300px;display:none;z-index:9999;">
+  <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+  <button id="accept-cookies" style="background:#4FC3F7;color:white;border:none;padding:8px 15px;border-radius:5px;cursor:pointer;margin-right:10px;">Accept</button>
+  <a href="/privacy" style="color:#add8e6;">Learn More</a>
+</div>
+
+<!-- Política de Privacidad (ejemplo básico) -->
+<div id="privacy-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;overflow:auto;">
+  <div style="background:white;margin:50px auto;padding:30px;max-width:800px;border-radius:8px;">
+    <h2>Privacy Policy & Cookie Information</h2>
+    <h3>Data Collection</h3>
+    <p>ClimaTok collects anonymous usage data through Google Analytics to improve our services. This includes:</p>
+    <ul>
+      <li>Browser type and version</li>
+      <li>Approximate geographic location (country/city)</li>
+      <li>Pages visited and interaction with weather maps</li>
+    </ul>
+    
+    <h3>Cookies</h3>
+    <p>We use cookies for:</p>
+    <ul>
+      <li>Google Analytics tracking</li>
+      <li>Ad serving (if ads are enabled)</li>
+      <li>Storing user preferences (language selection)</li>
+    </ul>
+    
+    <h3>Third Parties</h3>
+    <p>We may use:</p>
+    <ul>
+      <li>Google AdSense (for advertising)</li>
+      <li>MapTiler (for map services)</li>
+      <li>NOAA (weather data source)</li>
+    </ul>
+    
+    <button onclick="document.getElementById('privacy-modal').style.display='none'" style="background:#4FC3F7;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin-top:20px;">Close</button>
+  </div>
+</div>
+
+<!-- Botón de Privacidad en Footer -->
+<!-- <div style="position:fixed;top:135px;left:10px;z-index:1000;">
+  <button onclick="document.getElementById('privacy-modal').style.display='block'" style="background:rgba(0,0,0,0.7);color:white;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:5px;font-size:12px;cursor:pointer;">Privacy & Cookies</button>
+</div> -->
+
+<!-- Premium modal -->
+<div class="modal fade" id="premiumModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background: rgba(15,15,18,.98); color: #fff; border: 1px solid rgba(255,255,255,.15);">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,.12);">
+        <h5 class="modal-title" style="margin:0;">ClimaTok Premium - Forecast 14 days</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="font-size: 14px; line-height: 1.35;">
+        iPhone & iPad version available on App Store.<br>
+        Coming soon Android version on Google Play.
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,.12);">
+        <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+  crossorigin="anonymous"></script>
+
+  <script>
+  (function () {
+    const btn = document.getElementById('premium-cta');
+    const modalEl = document.getElementById('premiumModal');
+    if (!btn || !modalEl || !window.bootstrap) return;
+
+    const modal = new bootstrap.Modal(modalEl, { backdrop: true, keyboard: true });
+
+    btn.addEventListener('click', () => {
+      modal.show();
+    });
+  })();
+</script>
+
+</body>
+</html>
+
+
+
