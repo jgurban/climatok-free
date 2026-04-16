@@ -1325,7 +1325,8 @@ function updateAppStoreBadgeVisibility(isPremium){
 }
 
 // Límite de la versión gratuita: 3 días = 72 horas desde el primer datetime.
-const FREE_MAX_HOURS = 48;
+// EDITADO
+const FREE_MAX_HOURS = 480;
 
 
 
