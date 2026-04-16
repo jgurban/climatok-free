@@ -3078,3 +3078,8 @@ rgb(65, 166, 255);
   line-height: 1;
   color: #fff;
 }
+
+#time-step-button,
+#toggle-alerts-bt {
+  display: none !important;
+}
