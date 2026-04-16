@@ -7297,8 +7297,8 @@ btG.addEventListener('click', (e) => {
 
 function showGlobeMobileOnlyModal() {
   const message = IS_ES
-    ? "La versión 3D con 14 dias de pronostico solo está disponible en iPhone y Android"
-    : "3D version with 14 days forecast is only available on iPhone and Android";
+    ? "La versión 3D con 14 dias de pronostico solo está disponible en las versiones Premium de iPhone y Android"
+    : "3D version with 14 days forecast is only available on Premium versions of iPhone and Android";
 
   const buttonText = IS_ES
     ? "Ir a descargar la app"
@@ -7366,7 +7366,7 @@ function showGlobeMobileOnlyModal() {
 
   // 👉 botón principal → landing con enlaces
   document.getElementById('go-app-download').onclick = () => {
-    window.location.href = "https://tangerine-elf-d75ce2.netlify.app/app/";
+    window.location.href = "https://tangerine-elf-d75ce2.netlify.app/";
   };
 
   // cerrar
