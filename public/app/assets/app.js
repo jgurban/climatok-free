@@ -7297,8 +7297,8 @@ btG.addEventListener('click', (e) => {
 
 function showGlobeMobileOnlyModal() {
   const message = IS_ES
-    ? "La versión 3D con 14 dias de pronostico solo está disponible en las versiones Premium de iPhone y Android"
-    : "3D version with 14 days forecast is only available on Premium versions of iPhone and Android";
+    ? "La versión 3D con 14 dias de pronostico solo está disponible en las versiones Premium"
+    : "3D version with 14 days forecast is only available on Premium versions";
 
   const buttonText = IS_ES
     ? "Ir a descargar la app"
