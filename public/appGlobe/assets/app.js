@@ -4924,7 +4924,23 @@ async function warmUpFrames(dataset, datetimes, aroundISO) {
 
 
 
+// window.__PRECACHE_DONE__ = window.__PRECACHE_DONE__ || new Set();
 window.__PRECACHE_DONE__ = window.__PRECACHE_DONE__ || new Set();
+window.__INITIAL_PRECACHING__ = false;
+window.__INITIAL_PRECACHED__ = false;
+
+function setPlaybackControlsDisabled(disabled) {
+  const playBtn1 = document.getElementById('play-button');
+  const playBtn2 = document.getElementById('play-pause-bt');
+  const nowBtn   = document.getElementById('now-bt');
+
+  if (playBtn1) playBtn1.disabled = disabled;
+  if (playBtn2) playBtn2.disabled = disabled;
+  if (nowBtn)   nowBtn.disabled = disabled;
+
+  document.documentElement.classList.toggle('precache-running', disabled);
+}
+
 
 const __SEEN_NEXT = new Set();
 function keyFor(runUTC, L){ return `${runUTC}/${L}`; }
@@ -7547,8 +7563,10 @@ function triggerNowButtonOnce() {
 
 // Ejecuta “Now” cuando el mapa ya está renderizando (idle)
 function runNowOnFirstLoad() {
+  if (window.__INITIAL_PRECACHING__) return;
+  if (!window.__INITIAL_PRECACHED__) return;
+
   if (!window.map) {
-    // por si map aún no existe
     setTimeout(runNowOnFirstLoad, 200);
     return;
   }
@@ -7566,7 +7584,7 @@ function runNowOnFirstLoad() {
 }
 
 // Llamar al arrancar (primera carga)
-document.addEventListener("DOMContentLoaded", runNowOnFirstLoad);
+// document.addEventListener("DOMContentLoaded", runNowOnFirstLoad);
 
 
         function makeMarker(
