@@ -2052,11 +2052,7 @@ if (dataOffBtn) {
     // Conmutación Play/Pause
     btn.addEventListener('click', () => {
 
-if (window.__INITIAL_PRECACHING__) {
-  e.preventDefault();
-  e.stopPropagation();
-  return;
-}
+
 
       const isPlaying = btn.dataset.state === 'playing';
       if (isPlaying) {
@@ -10970,6 +10966,9 @@ map.once('idle', async () => {
   try {
     const datasetCustom = 'gfs/reflectivity_1000m_above_ground'; // Ajusta este ID según el dataset real
 
+
+    await precacheDatasets('gfs/reflectivity_1000m_above_ground');
+    
     // (opcional) metadata WL
     await client.loadDataset(datasetCustom);
 
@@ -11870,6 +11869,12 @@ timeSlider.addEventListener('touchend', onRelease);    // fallback iOS
 
 
     playPauseButton.addEventListener("click", () => {
+
+      if (window.__INITIAL_PRECACHING__) {
+  e.preventDefault();
+  e.stopPropagation();
+  return;
+}
 
      
        document.querySelectorAll(".markerTemperature").forEach(el => {
