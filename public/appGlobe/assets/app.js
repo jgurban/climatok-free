@@ -2051,6 +2051,13 @@ if (dataOffBtn) {
 
     // Conmutación Play/Pause
     btn.addEventListener('click', () => {
+
+if (window.__INITIAL_PRECACHING__) {
+  e.preventDefault();
+  e.stopPropagation();
+  return;
+}
+
       const isPlaying = btn.dataset.state === 'playing';
       if (isPlaying) {
         // Pasar a PAUSA
@@ -4955,6 +4962,9 @@ function __buildPrecacheKey(layer, hoursToPreload, rangeStr, step) {
 
 async function precacheDatasets(layer) {
 
+  window.__INITIAL_PRECACHING__ = true;
+setPlaybackControlsDisabled(true);
+
   // === Selección de horas a precargar (igual que tu lógica actual) ===
   const IS_IPHONE = /iPhone|iPod/i.test(navigator.userAgent);
   const IS_LOW_HEADROOM = IS_IPHONE && (
@@ -4973,12 +4983,14 @@ async function precacheDatasets(layer) {
 
   // === SKIP tempranero si ya está precargado para esta clave ===
   const key = __buildPrecacheKey(layer, hoursToPreload, rangeStr, step);
-  if (window.__PRECACHE_DONE__.has(key)) {
-    (window.__NET_UI_LOG__||console.log)(`⏭️ Skip precache (already done): ${key}`);
-    // opcional: muestra UI de “listo”
-    try { showPrecacheFinished(layer); } catch {}
-    return;
-  }
+if (window.__PRECACHE_DONE__.has(key)) {
+  (window.__NET_UI_LOG__||console.log)(`⏭️ Skip precache (already done): ${key}`);
+  window.__INITIAL_PRECACHING__ = false;
+  window.__INITIAL_PRECACHED__ = true;
+  setPlaybackControlsDisabled(false);
+  try { showPrecacheFinished(layer); } catch {}
+  return;
+}
 
   // === A partir de aquí, SÍ hacemos precarga (cancelamos la anterior y bloqueamos UI) ===
   cancelPrecache();
@@ -4989,8 +5001,8 @@ async function precacheDatasets(layer) {
   // UI bloqueada solo si realmente vamos a precargar
   const playBtn1 = document.getElementById('play-button');
   const playBtn2 = document.getElementById('play-pause-bt');
-  if (playBtn1) playBtn1.disabled = true;
-  if (playBtn2) playBtn2.disabled = true;
+  // if (playBtn1) playBtn1.disabled = true;
+  // if (playBtn2) playBtn2.disabled = true;
 
   window.__NET_TOAST__?.show?.('Please wait, preloading all meteorology tiles…');
 
@@ -5139,8 +5151,11 @@ pushNetStatus('Loading');; // muestra UI al empezar
 //   }
 
 
-        if (playBtn1) playBtn1.disabled = false;
-        if (playBtn2) playBtn2.disabled = false;
+        // if (playBtn1) playBtn1.disabled = false;
+        // if (playBtn2) playBtn2.disabled = false;
+        window.__INITIAL_PRECACHING__ = false;
+window.__INITIAL_PRECACHED__ = true;
+setPlaybackControlsDisabled(false);
 
       //      // 👇 NUEVO: respetar el modelo actual
       // const isEcmwf = (window.currentModel === 'ecmwf');
